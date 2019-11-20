@@ -1,9 +1,43 @@
-import React from 'react'
-import styled from 'styled-components'
+import { useApolloClient } from '@apollo/react-hooks';
+import cookie from 'cookie';
+import React from 'react';
+import { withApollo } from '../lib/apollo';
+import checkLoggedIn from '../lib/checkLoggedIn';
+import redirect from '../lib/redirect';
 
-const Title = styled.h1`
-  color: red;
-  font-size: 50px;
-`
+const IndexPage = ({ loggedInUser }: any) => {
+  const apolloClient = useApolloClient();
 
-export default () => <Title>My page</Title>
+  const signout = () => {
+    document.cookie = cookie.serialize('token', '', {
+      maxAge: -1 // Expire the cookie immediately
+    });
+
+    // Force a reload of all the current queries now that the user is
+    // logged in, so we don't accidentally leave any state around.
+    apolloClient.cache.reset().then(() => {
+      // Redirect to a more useful page when signed out
+      redirect({}, '/signin');
+    });
+  };
+
+  return (
+    <div>
+      Hello {loggedInUser.me.name}!<br />
+      <button onClick={signout}>Sign out</button>
+    </div>
+  );
+};
+
+IndexPage.getInitialProps = async (context: any) => {
+  const { loggedInUser } = await checkLoggedIn(context.apolloClient);
+
+  if (!loggedInUser.me) {
+    // If not signed in, send them somewhere more useful
+    redirect(context, '/signin');
+  }
+
+  return { loggedInUser };
+};
+
+export default withApollo(IndexPage);
