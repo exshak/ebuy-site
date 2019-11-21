@@ -1,14 +1,22 @@
 mutation {
   user1: createUser(
     data: {
-      email: "alice@prisma.io"
       name: "Alice"
+      email: "alice@prisma.io"
       password: "$2b$10$dqyYw5XovLjpmkYNiRDEWuwKaRAvLaG45fnXE5b3KTccKZcRPka2m" # "secret42"
       posts: {
         create: {
-          title: "Join us for GraphQL Conf 2019 in Berlin"
-          content: "https://www.graphqlconf.org/"
+          title: "iPhone"
+          description: "New"
+          location: "Canada"
+          price: 500
           published: true
+          subcategory: {
+            create: {
+              name: "Cell Phones"
+              category: { create: { name: "Phones" } }
+            }
+          }
         }
       }
     }
@@ -18,19 +26,36 @@ mutation {
 
   user2: createUser(
     data: {
-      email: "bob@prisma.io"
       name: "Bob"
+      email: "bob@prisma.io"
       password: "$2b$10$o6KioO.taArzboM44Ig85O3ZFZYZpR3XD7mI8T29eP4znU/.xyJbW" # "secret43"
       posts: {
         create: [
           {
-            title: "Subscribe to GraphQL Weekly for community news"
-            content: "https://graphqlweekly.com/"
+            title: "MacBook"
+            description: "New"
+            location: "USA"
+            price: 1000
             published: true
+            subcategory: {
+              create: {
+                name: "Laptop"
+                category: { create: { name: "Computers" } }
+              }
+            }
           }
           {
-            title: "Follow Prisma on Twitter"
-            content: "https://twitter.com/prisma"
+            title: "AirPods"
+            description: "Used"
+            location: "USA"
+            price: 250
+            published: true
+            subcategory: {
+              create: {
+                name: "Headphones"
+                category: { create: { name: "Audio" } }
+              }
+            }
           }
         ]
       }

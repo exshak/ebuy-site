@@ -1,17 +1,53 @@
-type Post {
-  id: ID! @id
-  createdAt: DateTime! @createdAt
-  updatedAt: DateTime! @updatedAt
-  published: Boolean! @default(value: false)
-  title: String!
-  content: String!
-  author: User!
+enum Permission {
+  USER
+  ADMIN
 }
 
 type User {
   id: ID! @id
+  name: String!
   email: String! @unique
   password: String!
-  name: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  permission: Permission! @default(value: USER)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  # messages: [Message!]!
   posts: [Post!]!
+}
+
+type Category {
+  id: ID! @id
+  name: String!
+}
+
+type SubCategory {
+  id: ID! @id
+  name: String!
+  category: Category!
+}
+
+type Post {
+  id: ID! @id
+  title: String!
+  description: String!
+  image: String
+  imageLarge: String
+  location: String!
+  price: Int!
+  owner: User!
+  subcategory: SubCategory!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  published: Boolean! @default(value: false)
+}
+
+type Message {
+  id: ID! @id
+  title: String!
+  content: String!
+  author: User!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
