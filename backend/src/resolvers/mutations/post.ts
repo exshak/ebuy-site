@@ -1,23 +1,19 @@
-import { Context, getUserId } from "../../utils";
+import { Context, getUserId } from '../../utils';
 
 export const post = {
   async createPost(parent, args, ctx: Context, info) {
     const userId = getUserId(ctx);
-    const posted = await ctx.prisma.createPost(
-      {
-        // data: {
-        owner: {
-          connect: { id: userId }
-        },
-        subcategory: {
-          connect: { id: args.subcategoryId }
-        },
-        ...args
-        // }
-      }
-      // info
-    );
-    return posted;
+    const subcategoryId = args.subcategoryId;
+    delete args.subcategoryId;
+    return await ctx.prisma.createPost({
+      owner: {
+        connect: { id: userId }
+      },
+      subcategory: {
+        connect: { id: subcategoryId }
+      },
+      ...args
+    });
   },
 
   async updatePost(parent, { id }, ctx: Context, info) {

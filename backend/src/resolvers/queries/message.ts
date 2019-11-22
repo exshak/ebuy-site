@@ -9,7 +9,7 @@ export const message = {
     const id = getUserId(ctx);
 
     const where = {
-      author: {
+      user: {
         id
       }
     };

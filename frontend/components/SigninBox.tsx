@@ -1,8 +1,8 @@
-import { useApolloClient, useMutation } from "@apollo/react-hooks";
-import cookie from "cookie";
-import gql from "graphql-tag";
-import { useRef } from "react";
-import redirect from "../lib/redirect";
+import { useApolloClient, useMutation } from '@apollo/react-hooks';
+import cookie from 'cookie';
+import gql from 'graphql-tag';
+import { useRef } from 'react';
+import redirect from '../lib/redirect';
 
 const SIGN_IN = gql`
   mutation Signin($email: String!, $password: String!) {
@@ -18,15 +18,15 @@ const SigninBox = () => {
 
   const onCompleted = (data: any) => {
     // Store the token in cookie
-    document.cookie = cookie.serialize("token", data.signin.token, {
+    document.cookie = cookie.serialize('token', data.signin.token, {
       sameSite: true,
-      path: "/",
+      path: '/',
       maxAge: 30 * 24 * 60 * 60 // 30 days
     });
     // Force a reload of all the current queries now that the user is
     // logged in
     client.cache.reset().then(() => {
-      redirect({}, "/");
+      redirect({}, '/');
     });
   };
 
@@ -55,17 +55,17 @@ const SigninBox = () => {
           }
         });
 
-        email.current.value = password.current.value = "";
+        email.current.value = password.current.value = '';
       }}
     >
       {error && <p>No user found with that information.</p>}
-      <input name="email" placeholder="Email" ref={email} />
+      <input name='email' placeholder='Email' ref={email} />
       <br />
       <input
-        name="password"
-        placeholder="Password"
+        name='password'
+        placeholder='Password'
         ref={password}
-        type="password"
+        type='password'
       />
       <br />
       <button>Sign in</button>

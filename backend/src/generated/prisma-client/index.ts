@@ -17,6 +17,7 @@ export type Maybe<T> = T | undefined | null;
 
 export interface Exists {
   category: (where?: CategoryWhereInput) => Promise<boolean>;
+  conversation: (where?: ConversationWhereInput) => Promise<boolean>;
   message: (where?: MessageWhereInput) => Promise<boolean>;
   post: (where?: PostWhereInput) => Promise<boolean>;
   subCategory: (where?: SubCategoryWhereInput) => Promise<boolean>;
@@ -61,6 +62,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => CategoryConnectionPromise;
+  conversation: (
+    where: ConversationWhereUniqueInput
+  ) => ConversationNullablePromise;
+  conversations: (args?: {
+    where?: ConversationWhereInput;
+    orderBy?: ConversationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<Conversation>;
+  conversationsConnection: (args?: {
+    where?: ConversationWhereInput;
+    orderBy?: ConversationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => ConversationConnectionPromise;
   message: (where: MessageWhereUniqueInput) => MessageNullablePromise;
   messages: (args?: {
     where?: MessageWhereInput;
@@ -161,6 +183,26 @@ export interface Prisma {
   }) => CategoryPromise;
   deleteCategory: (where: CategoryWhereUniqueInput) => CategoryPromise;
   deleteManyCategories: (where?: CategoryWhereInput) => BatchPayloadPromise;
+  createConversation: (data: ConversationCreateInput) => ConversationPromise;
+  updateConversation: (args: {
+    data: ConversationUpdateInput;
+    where: ConversationWhereUniqueInput;
+  }) => ConversationPromise;
+  updateManyConversations: (args: {
+    data: ConversationUpdateManyMutationInput;
+    where?: ConversationWhereInput;
+  }) => BatchPayloadPromise;
+  upsertConversation: (args: {
+    where: ConversationWhereUniqueInput;
+    create: ConversationCreateInput;
+    update: ConversationUpdateInput;
+  }) => ConversationPromise;
+  deleteConversation: (
+    where: ConversationWhereUniqueInput
+  ) => ConversationPromise;
+  deleteManyConversations: (
+    where?: ConversationWhereInput
+  ) => BatchPayloadPromise;
   createMessage: (data: MessageCreateInput) => MessagePromise;
   updateMessage: (args: {
     data: MessageUpdateInput;
@@ -239,6 +281,9 @@ export interface Subscription {
   category: (
     where?: CategorySubscriptionWhereInput
   ) => CategorySubscriptionPayloadSubscription;
+  conversation: (
+    where?: ConversationSubscriptionWhereInput
+  ) => ConversationSubscriptionPayloadSubscription;
   message: (
     where?: MessageSubscriptionWhereInput
   ) => MessageSubscriptionPayloadSubscription;
@@ -261,13 +306,13 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type CategoryOrderByInput =
+export type Role = "USER" | "ADMIN";
+
+export type SubCategoryOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "name_ASC"
   | "name_DESC";
-
-export type Permission = "USER" | "ADMIN";
 
 export type PostOrderByInput =
   | "id_ASC"
@@ -291,23 +336,15 @@ export type PostOrderByInput =
   | "published_ASC"
   | "published_DESC";
 
-export type MessageOrderByInput =
+export type ConversationOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "title_ASC"
   | "title_DESC"
-  | "content_ASC"
-  | "content_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
-
-export type SubCategoryOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "name_ASC"
-  | "name_DESC";
 
 export type UserOrderByInput =
   | "id_ASC"
@@ -322,18 +359,72 @@ export type UserOrderByInput =
   | "resetToken_DESC"
   | "resetTokenExpiry_ASC"
   | "resetTokenExpiry_DESC"
-  | "permission_ASC"
-  | "permission_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "role_ASC"
+  | "role_DESC";
+
+export type MessageOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "text_ASC"
+  | "text_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
+
+export type CategoryOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "name_ASC"
+  | "name_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
 export type CategoryWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
+
+export interface SubCategoryWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  category?: Maybe<CategoryWhereInput>;
+  posts_every?: Maybe<PostWhereInput>;
+  posts_some?: Maybe<PostWhereInput>;
+  posts_none?: Maybe<PostWhereInput>;
+  AND?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
+  OR?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
+  NOT?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
+}
 
 export interface CategoryWhereInput {
   id?: Maybe<ID_Input>;
@@ -364,14 +455,13 @@ export interface CategoryWhereInput {
   name_not_starts_with?: Maybe<String>;
   name_ends_with?: Maybe<String>;
   name_not_ends_with?: Maybe<String>;
+  subcategories_every?: Maybe<SubCategoryWhereInput>;
+  subcategories_some?: Maybe<SubCategoryWhereInput>;
+  subcategories_none?: Maybe<SubCategoryWhereInput>;
   AND?: Maybe<CategoryWhereInput[] | CategoryWhereInput>;
   OR?: Maybe<CategoryWhereInput[] | CategoryWhereInput>;
   NOT?: Maybe<CategoryWhereInput[] | CategoryWhereInput>;
 }
-
-export type MessageWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
 
 export interface PostWhereInput {
   id?: Maybe<ID_Input>;
@@ -570,10 +660,12 @@ export interface UserWhereInput {
   resetTokenExpiry_lte?: Maybe<Float>;
   resetTokenExpiry_gt?: Maybe<Float>;
   resetTokenExpiry_gte?: Maybe<Float>;
-  permission?: Maybe<Permission>;
-  permission_not?: Maybe<Permission>;
-  permission_in?: Maybe<Permission[] | Permission>;
-  permission_not_in?: Maybe<Permission[] | Permission>;
+  posts_every?: Maybe<PostWhereInput>;
+  posts_some?: Maybe<PostWhereInput>;
+  posts_none?: Maybe<PostWhereInput>;
+  conversations_every?: Maybe<ConversationWhereInput>;
+  conversations_some?: Maybe<ConversationWhereInput>;
+  conversations_none?: Maybe<ConversationWhereInput>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -590,50 +682,16 @@ export interface UserWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
-  posts_every?: Maybe<PostWhereInput>;
-  posts_some?: Maybe<PostWhereInput>;
-  posts_none?: Maybe<PostWhereInput>;
+  role?: Maybe<Role>;
+  role_not?: Maybe<Role>;
+  role_in?: Maybe<Role[] | Role>;
+  role_not_in?: Maybe<Role[] | Role>;
   AND?: Maybe<UserWhereInput[] | UserWhereInput>;
   OR?: Maybe<UserWhereInput[] | UserWhereInput>;
   NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
 }
 
-export interface SubCategoryWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  category?: Maybe<CategoryWhereInput>;
-  AND?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
-  OR?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
-  NOT?: Maybe<SubCategoryWhereInput[] | SubCategoryWhereInput>;
-}
-
-export interface MessageWhereInput {
+export interface ConversationWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -662,21 +720,64 @@ export interface MessageWhereInput {
   title_not_starts_with?: Maybe<String>;
   title_ends_with?: Maybe<String>;
   title_not_ends_with?: Maybe<String>;
-  content?: Maybe<String>;
-  content_not?: Maybe<String>;
-  content_in?: Maybe<String[] | String>;
-  content_not_in?: Maybe<String[] | String>;
-  content_lt?: Maybe<String>;
-  content_lte?: Maybe<String>;
-  content_gt?: Maybe<String>;
-  content_gte?: Maybe<String>;
-  content_contains?: Maybe<String>;
-  content_not_contains?: Maybe<String>;
-  content_starts_with?: Maybe<String>;
-  content_not_starts_with?: Maybe<String>;
-  content_ends_with?: Maybe<String>;
-  content_not_ends_with?: Maybe<String>;
-  author?: Maybe<UserWhereInput>;
+  users_every?: Maybe<UserWhereInput>;
+  users_some?: Maybe<UserWhereInput>;
+  users_none?: Maybe<UserWhereInput>;
+  messages_every?: Maybe<MessageWhereInput>;
+  messages_some?: Maybe<MessageWhereInput>;
+  messages_none?: Maybe<MessageWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<ConversationWhereInput[] | ConversationWhereInput>;
+  OR?: Maybe<ConversationWhereInput[] | ConversationWhereInput>;
+  NOT?: Maybe<ConversationWhereInput[] | ConversationWhereInput>;
+}
+
+export interface MessageWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  text?: Maybe<String>;
+  text_not?: Maybe<String>;
+  text_in?: Maybe<String[] | String>;
+  text_not_in?: Maybe<String[] | String>;
+  text_lt?: Maybe<String>;
+  text_lte?: Maybe<String>;
+  text_gt?: Maybe<String>;
+  text_gte?: Maybe<String>;
+  text_contains?: Maybe<String>;
+  text_not_contains?: Maybe<String>;
+  text_starts_with?: Maybe<String>;
+  text_not_starts_with?: Maybe<String>;
+  text_ends_with?: Maybe<String>;
+  text_not_ends_with?: Maybe<String>;
+  user?: Maybe<UserWhereInput>;
+  conversation?: Maybe<ConversationWhereInput>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -698,6 +799,14 @@ export interface MessageWhereInput {
   NOT?: Maybe<MessageWhereInput[] | MessageWhereInput>;
 }
 
+export type ConversationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type MessageWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
 export type PostWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
@@ -714,21 +823,85 @@ export type UserWhereUniqueInput = AtLeastOne<{
 export interface CategoryCreateInput {
   id?: Maybe<ID_Input>;
   name: String;
+  subcategories?: Maybe<SubCategoryCreateManyWithoutCategoryInput>;
 }
 
-export interface CategoryUpdateInput {
-  name?: Maybe<String>;
+export interface SubCategoryCreateManyWithoutCategoryInput {
+  create?: Maybe<
+    | SubCategoryCreateWithoutCategoryInput[]
+    | SubCategoryCreateWithoutCategoryInput
+  >;
+  connect?: Maybe<SubCategoryWhereUniqueInput[] | SubCategoryWhereUniqueInput>;
 }
 
-export interface CategoryUpdateManyMutationInput {
-  name?: Maybe<String>;
+export interface SubCategoryCreateWithoutCategoryInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+  posts?: Maybe<PostCreateManyWithoutSubcategoryInput>;
 }
 
-export interface MessageCreateInput {
+export interface PostCreateManyWithoutSubcategoryInput {
+  create?: Maybe<
+    PostCreateWithoutSubcategoryInput[] | PostCreateWithoutSubcategoryInput
+  >;
+  connect?: Maybe<PostWhereUniqueInput[] | PostWhereUniqueInput>;
+}
+
+export interface PostCreateWithoutSubcategoryInput {
   id?: Maybe<ID_Input>;
   title: String;
-  content: String;
-  author: UserCreateOneInput;
+  description: String;
+  image?: Maybe<String>;
+  imageLarge?: Maybe<String>;
+  location: String;
+  price: Int;
+  owner: UserCreateOneWithoutPostsInput;
+  published?: Maybe<Boolean>;
+}
+
+export interface UserCreateOneWithoutPostsInput {
+  create?: Maybe<UserCreateWithoutPostsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface UserCreateWithoutPostsInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+  email: String;
+  password: String;
+  resetToken?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  conversations?: Maybe<ConversationCreateManyWithoutUsersInput>;
+  role?: Maybe<Role>;
+}
+
+export interface ConversationCreateManyWithoutUsersInput {
+  create?: Maybe<
+    ConversationCreateWithoutUsersInput[] | ConversationCreateWithoutUsersInput
+  >;
+  connect?: Maybe<
+    ConversationWhereUniqueInput[] | ConversationWhereUniqueInput
+  >;
+}
+
+export interface ConversationCreateWithoutUsersInput {
+  id?: Maybe<ID_Input>;
+  title: String;
+  messages?: Maybe<MessageCreateManyWithoutConversationInput>;
+}
+
+export interface MessageCreateManyWithoutConversationInput {
+  create?: Maybe<
+    | MessageCreateWithoutConversationInput[]
+    | MessageCreateWithoutConversationInput
+  >;
+  connect?: Maybe<MessageWhereUniqueInput[] | MessageWhereUniqueInput>;
+}
+
+export interface MessageCreateWithoutConversationInput {
+  id?: Maybe<ID_Input>;
+  text: String;
+  user: UserCreateOneInput;
 }
 
 export interface UserCreateOneInput {
@@ -743,8 +916,9 @@ export interface UserCreateInput {
   password: String;
   resetToken?: Maybe<String>;
   resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
   posts?: Maybe<PostCreateManyWithoutOwnerInput>;
+  conversations?: Maybe<ConversationCreateManyWithoutUsersInput>;
+  role?: Maybe<Role>;
 }
 
 export interface PostCreateManyWithoutOwnerInput {
@@ -760,30 +934,200 @@ export interface PostCreateWithoutOwnerInput {
   imageLarge?: Maybe<String>;
   location: String;
   price: Int;
-  subcategory: SubCategoryCreateOneInput;
+  subcategory: SubCategoryCreateOneWithoutPostsInput;
   published?: Maybe<Boolean>;
 }
 
-export interface SubCategoryCreateOneInput {
-  create?: Maybe<SubCategoryCreateInput>;
+export interface SubCategoryCreateOneWithoutPostsInput {
+  create?: Maybe<SubCategoryCreateWithoutPostsInput>;
   connect?: Maybe<SubCategoryWhereUniqueInput>;
 }
 
-export interface SubCategoryCreateInput {
+export interface SubCategoryCreateWithoutPostsInput {
   id?: Maybe<ID_Input>;
   name: String;
-  category: CategoryCreateOneInput;
+  category: CategoryCreateOneWithoutSubcategoriesInput;
 }
 
-export interface CategoryCreateOneInput {
-  create?: Maybe<CategoryCreateInput>;
+export interface CategoryCreateOneWithoutSubcategoriesInput {
+  create?: Maybe<CategoryCreateWithoutSubcategoriesInput>;
   connect?: Maybe<CategoryWhereUniqueInput>;
 }
 
-export interface MessageUpdateInput {
+export interface CategoryCreateWithoutSubcategoriesInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+}
+
+export interface CategoryUpdateInput {
+  name?: Maybe<String>;
+  subcategories?: Maybe<SubCategoryUpdateManyWithoutCategoryInput>;
+}
+
+export interface SubCategoryUpdateManyWithoutCategoryInput {
+  create?: Maybe<
+    | SubCategoryCreateWithoutCategoryInput[]
+    | SubCategoryCreateWithoutCategoryInput
+  >;
+  delete?: Maybe<SubCategoryWhereUniqueInput[] | SubCategoryWhereUniqueInput>;
+  connect?: Maybe<SubCategoryWhereUniqueInput[] | SubCategoryWhereUniqueInput>;
+  set?: Maybe<SubCategoryWhereUniqueInput[] | SubCategoryWhereUniqueInput>;
+  disconnect?: Maybe<
+    SubCategoryWhereUniqueInput[] | SubCategoryWhereUniqueInput
+  >;
+  update?: Maybe<
+    | SubCategoryUpdateWithWhereUniqueWithoutCategoryInput[]
+    | SubCategoryUpdateWithWhereUniqueWithoutCategoryInput
+  >;
+  upsert?: Maybe<
+    | SubCategoryUpsertWithWhereUniqueWithoutCategoryInput[]
+    | SubCategoryUpsertWithWhereUniqueWithoutCategoryInput
+  >;
+  deleteMany?: Maybe<
+    SubCategoryScalarWhereInput[] | SubCategoryScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | SubCategoryUpdateManyWithWhereNestedInput[]
+    | SubCategoryUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface SubCategoryUpdateWithWhereUniqueWithoutCategoryInput {
+  where: SubCategoryWhereUniqueInput;
+  data: SubCategoryUpdateWithoutCategoryDataInput;
+}
+
+export interface SubCategoryUpdateWithoutCategoryDataInput {
+  name?: Maybe<String>;
+  posts?: Maybe<PostUpdateManyWithoutSubcategoryInput>;
+}
+
+export interface PostUpdateManyWithoutSubcategoryInput {
+  create?: Maybe<
+    PostCreateWithoutSubcategoryInput[] | PostCreateWithoutSubcategoryInput
+  >;
+  delete?: Maybe<PostWhereUniqueInput[] | PostWhereUniqueInput>;
+  connect?: Maybe<PostWhereUniqueInput[] | PostWhereUniqueInput>;
+  set?: Maybe<PostWhereUniqueInput[] | PostWhereUniqueInput>;
+  disconnect?: Maybe<PostWhereUniqueInput[] | PostWhereUniqueInput>;
+  update?: Maybe<
+    | PostUpdateWithWhereUniqueWithoutSubcategoryInput[]
+    | PostUpdateWithWhereUniqueWithoutSubcategoryInput
+  >;
+  upsert?: Maybe<
+    | PostUpsertWithWhereUniqueWithoutSubcategoryInput[]
+    | PostUpsertWithWhereUniqueWithoutSubcategoryInput
+  >;
+  deleteMany?: Maybe<PostScalarWhereInput[] | PostScalarWhereInput>;
+  updateMany?: Maybe<
+    PostUpdateManyWithWhereNestedInput[] | PostUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface PostUpdateWithWhereUniqueWithoutSubcategoryInput {
+  where: PostWhereUniqueInput;
+  data: PostUpdateWithoutSubcategoryDataInput;
+}
+
+export interface PostUpdateWithoutSubcategoryDataInput {
   title?: Maybe<String>;
-  content?: Maybe<String>;
-  author?: Maybe<UserUpdateOneRequiredInput>;
+  description?: Maybe<String>;
+  image?: Maybe<String>;
+  imageLarge?: Maybe<String>;
+  location?: Maybe<String>;
+  price?: Maybe<Int>;
+  owner?: Maybe<UserUpdateOneRequiredWithoutPostsInput>;
+  published?: Maybe<Boolean>;
+}
+
+export interface UserUpdateOneRequiredWithoutPostsInput {
+  create?: Maybe<UserCreateWithoutPostsInput>;
+  update?: Maybe<UserUpdateWithoutPostsDataInput>;
+  upsert?: Maybe<UserUpsertWithoutPostsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface UserUpdateWithoutPostsDataInput {
+  name?: Maybe<String>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  resetToken?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  conversations?: Maybe<ConversationUpdateManyWithoutUsersInput>;
+  role?: Maybe<Role>;
+}
+
+export interface ConversationUpdateManyWithoutUsersInput {
+  create?: Maybe<
+    ConversationCreateWithoutUsersInput[] | ConversationCreateWithoutUsersInput
+  >;
+  delete?: Maybe<ConversationWhereUniqueInput[] | ConversationWhereUniqueInput>;
+  connect?: Maybe<
+    ConversationWhereUniqueInput[] | ConversationWhereUniqueInput
+  >;
+  set?: Maybe<ConversationWhereUniqueInput[] | ConversationWhereUniqueInput>;
+  disconnect?: Maybe<
+    ConversationWhereUniqueInput[] | ConversationWhereUniqueInput
+  >;
+  update?: Maybe<
+    | ConversationUpdateWithWhereUniqueWithoutUsersInput[]
+    | ConversationUpdateWithWhereUniqueWithoutUsersInput
+  >;
+  upsert?: Maybe<
+    | ConversationUpsertWithWhereUniqueWithoutUsersInput[]
+    | ConversationUpsertWithWhereUniqueWithoutUsersInput
+  >;
+  deleteMany?: Maybe<
+    ConversationScalarWhereInput[] | ConversationScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | ConversationUpdateManyWithWhereNestedInput[]
+    | ConversationUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface ConversationUpdateWithWhereUniqueWithoutUsersInput {
+  where: ConversationWhereUniqueInput;
+  data: ConversationUpdateWithoutUsersDataInput;
+}
+
+export interface ConversationUpdateWithoutUsersDataInput {
+  title?: Maybe<String>;
+  messages?: Maybe<MessageUpdateManyWithoutConversationInput>;
+}
+
+export interface MessageUpdateManyWithoutConversationInput {
+  create?: Maybe<
+    | MessageCreateWithoutConversationInput[]
+    | MessageCreateWithoutConversationInput
+  >;
+  delete?: Maybe<MessageWhereUniqueInput[] | MessageWhereUniqueInput>;
+  connect?: Maybe<MessageWhereUniqueInput[] | MessageWhereUniqueInput>;
+  set?: Maybe<MessageWhereUniqueInput[] | MessageWhereUniqueInput>;
+  disconnect?: Maybe<MessageWhereUniqueInput[] | MessageWhereUniqueInput>;
+  update?: Maybe<
+    | MessageUpdateWithWhereUniqueWithoutConversationInput[]
+    | MessageUpdateWithWhereUniqueWithoutConversationInput
+  >;
+  upsert?: Maybe<
+    | MessageUpsertWithWhereUniqueWithoutConversationInput[]
+    | MessageUpsertWithWhereUniqueWithoutConversationInput
+  >;
+  deleteMany?: Maybe<MessageScalarWhereInput[] | MessageScalarWhereInput>;
+  updateMany?: Maybe<
+    | MessageUpdateManyWithWhereNestedInput[]
+    | MessageUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface MessageUpdateWithWhereUniqueWithoutConversationInput {
+  where: MessageWhereUniqueInput;
+  data: MessageUpdateWithoutConversationDataInput;
+}
+
+export interface MessageUpdateWithoutConversationDataInput {
+  text?: Maybe<String>;
+  user?: Maybe<UserUpdateOneRequiredInput>;
 }
 
 export interface UserUpdateOneRequiredInput {
@@ -799,8 +1143,9 @@ export interface UserUpdateDataInput {
   password?: Maybe<String>;
   resetToken?: Maybe<String>;
   resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
   posts?: Maybe<PostUpdateManyWithoutOwnerInput>;
+  conversations?: Maybe<ConversationUpdateManyWithoutUsersInput>;
+  role?: Maybe<Role>;
 }
 
 export interface PostUpdateManyWithoutOwnerInput {
@@ -835,41 +1180,41 @@ export interface PostUpdateWithoutOwnerDataInput {
   imageLarge?: Maybe<String>;
   location?: Maybe<String>;
   price?: Maybe<Int>;
-  subcategory?: Maybe<SubCategoryUpdateOneRequiredInput>;
+  subcategory?: Maybe<SubCategoryUpdateOneRequiredWithoutPostsInput>;
   published?: Maybe<Boolean>;
 }
 
-export interface SubCategoryUpdateOneRequiredInput {
-  create?: Maybe<SubCategoryCreateInput>;
-  update?: Maybe<SubCategoryUpdateDataInput>;
-  upsert?: Maybe<SubCategoryUpsertNestedInput>;
+export interface SubCategoryUpdateOneRequiredWithoutPostsInput {
+  create?: Maybe<SubCategoryCreateWithoutPostsInput>;
+  update?: Maybe<SubCategoryUpdateWithoutPostsDataInput>;
+  upsert?: Maybe<SubCategoryUpsertWithoutPostsInput>;
   connect?: Maybe<SubCategoryWhereUniqueInput>;
 }
 
-export interface SubCategoryUpdateDataInput {
+export interface SubCategoryUpdateWithoutPostsDataInput {
   name?: Maybe<String>;
-  category?: Maybe<CategoryUpdateOneRequiredInput>;
+  category?: Maybe<CategoryUpdateOneRequiredWithoutSubcategoriesInput>;
 }
 
-export interface CategoryUpdateOneRequiredInput {
-  create?: Maybe<CategoryCreateInput>;
-  update?: Maybe<CategoryUpdateDataInput>;
-  upsert?: Maybe<CategoryUpsertNestedInput>;
+export interface CategoryUpdateOneRequiredWithoutSubcategoriesInput {
+  create?: Maybe<CategoryCreateWithoutSubcategoriesInput>;
+  update?: Maybe<CategoryUpdateWithoutSubcategoriesDataInput>;
+  upsert?: Maybe<CategoryUpsertWithoutSubcategoriesInput>;
   connect?: Maybe<CategoryWhereUniqueInput>;
 }
 
-export interface CategoryUpdateDataInput {
+export interface CategoryUpdateWithoutSubcategoriesDataInput {
   name?: Maybe<String>;
 }
 
-export interface CategoryUpsertNestedInput {
-  update: CategoryUpdateDataInput;
-  create: CategoryCreateInput;
+export interface CategoryUpsertWithoutSubcategoriesInput {
+  update: CategoryUpdateWithoutSubcategoriesDataInput;
+  create: CategoryCreateWithoutSubcategoriesInput;
 }
 
-export interface SubCategoryUpsertNestedInput {
-  update: SubCategoryUpdateDataInput;
-  create: SubCategoryCreateInput;
+export interface SubCategoryUpsertWithoutPostsInput {
+  update: SubCategoryUpdateWithoutPostsDataInput;
+  create: SubCategoryCreateWithoutPostsInput;
 }
 
 export interface PostUpsertWithWhereUniqueWithoutOwnerInput {
@@ -1014,9 +1359,439 @@ export interface UserUpsertNestedInput {
   create: UserCreateInput;
 }
 
-export interface MessageUpdateManyMutationInput {
+export interface MessageUpsertWithWhereUniqueWithoutConversationInput {
+  where: MessageWhereUniqueInput;
+  update: MessageUpdateWithoutConversationDataInput;
+  create: MessageCreateWithoutConversationInput;
+}
+
+export interface MessageScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  text?: Maybe<String>;
+  text_not?: Maybe<String>;
+  text_in?: Maybe<String[] | String>;
+  text_not_in?: Maybe<String[] | String>;
+  text_lt?: Maybe<String>;
+  text_lte?: Maybe<String>;
+  text_gt?: Maybe<String>;
+  text_gte?: Maybe<String>;
+  text_contains?: Maybe<String>;
+  text_not_contains?: Maybe<String>;
+  text_starts_with?: Maybe<String>;
+  text_not_starts_with?: Maybe<String>;
+  text_ends_with?: Maybe<String>;
+  text_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<MessageScalarWhereInput[] | MessageScalarWhereInput>;
+  OR?: Maybe<MessageScalarWhereInput[] | MessageScalarWhereInput>;
+  NOT?: Maybe<MessageScalarWhereInput[] | MessageScalarWhereInput>;
+}
+
+export interface MessageUpdateManyWithWhereNestedInput {
+  where: MessageScalarWhereInput;
+  data: MessageUpdateManyDataInput;
+}
+
+export interface MessageUpdateManyDataInput {
+  text?: Maybe<String>;
+}
+
+export interface ConversationUpsertWithWhereUniqueWithoutUsersInput {
+  where: ConversationWhereUniqueInput;
+  update: ConversationUpdateWithoutUsersDataInput;
+  create: ConversationCreateWithoutUsersInput;
+}
+
+export interface ConversationScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
   title?: Maybe<String>;
-  content?: Maybe<String>;
+  title_not?: Maybe<String>;
+  title_in?: Maybe<String[] | String>;
+  title_not_in?: Maybe<String[] | String>;
+  title_lt?: Maybe<String>;
+  title_lte?: Maybe<String>;
+  title_gt?: Maybe<String>;
+  title_gte?: Maybe<String>;
+  title_contains?: Maybe<String>;
+  title_not_contains?: Maybe<String>;
+  title_starts_with?: Maybe<String>;
+  title_not_starts_with?: Maybe<String>;
+  title_ends_with?: Maybe<String>;
+  title_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<ConversationScalarWhereInput[] | ConversationScalarWhereInput>;
+  OR?: Maybe<ConversationScalarWhereInput[] | ConversationScalarWhereInput>;
+  NOT?: Maybe<ConversationScalarWhereInput[] | ConversationScalarWhereInput>;
+}
+
+export interface ConversationUpdateManyWithWhereNestedInput {
+  where: ConversationScalarWhereInput;
+  data: ConversationUpdateManyDataInput;
+}
+
+export interface ConversationUpdateManyDataInput {
+  title?: Maybe<String>;
+}
+
+export interface UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput;
+  create: UserCreateWithoutPostsInput;
+}
+
+export interface PostUpsertWithWhereUniqueWithoutSubcategoryInput {
+  where: PostWhereUniqueInput;
+  update: PostUpdateWithoutSubcategoryDataInput;
+  create: PostCreateWithoutSubcategoryInput;
+}
+
+export interface SubCategoryUpsertWithWhereUniqueWithoutCategoryInput {
+  where: SubCategoryWhereUniqueInput;
+  update: SubCategoryUpdateWithoutCategoryDataInput;
+  create: SubCategoryCreateWithoutCategoryInput;
+}
+
+export interface SubCategoryScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  AND?: Maybe<SubCategoryScalarWhereInput[] | SubCategoryScalarWhereInput>;
+  OR?: Maybe<SubCategoryScalarWhereInput[] | SubCategoryScalarWhereInput>;
+  NOT?: Maybe<SubCategoryScalarWhereInput[] | SubCategoryScalarWhereInput>;
+}
+
+export interface SubCategoryUpdateManyWithWhereNestedInput {
+  where: SubCategoryScalarWhereInput;
+  data: SubCategoryUpdateManyDataInput;
+}
+
+export interface SubCategoryUpdateManyDataInput {
+  name?: Maybe<String>;
+}
+
+export interface CategoryUpdateManyMutationInput {
+  name?: Maybe<String>;
+}
+
+export interface ConversationCreateInput {
+  id?: Maybe<ID_Input>;
+  title: String;
+  users?: Maybe<UserCreateManyWithoutConversationsInput>;
+  messages?: Maybe<MessageCreateManyWithoutConversationInput>;
+}
+
+export interface UserCreateManyWithoutConversationsInput {
+  create?: Maybe<
+    UserCreateWithoutConversationsInput[] | UserCreateWithoutConversationsInput
+  >;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+}
+
+export interface UserCreateWithoutConversationsInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+  email: String;
+  password: String;
+  resetToken?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  posts?: Maybe<PostCreateManyWithoutOwnerInput>;
+  role?: Maybe<Role>;
+}
+
+export interface ConversationUpdateInput {
+  title?: Maybe<String>;
+  users?: Maybe<UserUpdateManyWithoutConversationsInput>;
+  messages?: Maybe<MessageUpdateManyWithoutConversationInput>;
+}
+
+export interface UserUpdateManyWithoutConversationsInput {
+  create?: Maybe<
+    UserCreateWithoutConversationsInput[] | UserCreateWithoutConversationsInput
+  >;
+  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  update?: Maybe<
+    | UserUpdateWithWhereUniqueWithoutConversationsInput[]
+    | UserUpdateWithWhereUniqueWithoutConversationsInput
+  >;
+  upsert?: Maybe<
+    | UserUpsertWithWhereUniqueWithoutConversationsInput[]
+    | UserUpsertWithWhereUniqueWithoutConversationsInput
+  >;
+  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  updateMany?: Maybe<
+    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface UserUpdateWithWhereUniqueWithoutConversationsInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateWithoutConversationsDataInput;
+}
+
+export interface UserUpdateWithoutConversationsDataInput {
+  name?: Maybe<String>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  resetToken?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  posts?: Maybe<PostUpdateManyWithoutOwnerInput>;
+  role?: Maybe<Role>;
+}
+
+export interface UserUpsertWithWhereUniqueWithoutConversationsInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateWithoutConversationsDataInput;
+  create: UserCreateWithoutConversationsInput;
+}
+
+export interface UserScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  resetToken?: Maybe<String>;
+  resetToken_not?: Maybe<String>;
+  resetToken_in?: Maybe<String[] | String>;
+  resetToken_not_in?: Maybe<String[] | String>;
+  resetToken_lt?: Maybe<String>;
+  resetToken_lte?: Maybe<String>;
+  resetToken_gt?: Maybe<String>;
+  resetToken_gte?: Maybe<String>;
+  resetToken_contains?: Maybe<String>;
+  resetToken_not_contains?: Maybe<String>;
+  resetToken_starts_with?: Maybe<String>;
+  resetToken_not_starts_with?: Maybe<String>;
+  resetToken_ends_with?: Maybe<String>;
+  resetToken_not_ends_with?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  resetTokenExpiry_not?: Maybe<Float>;
+  resetTokenExpiry_in?: Maybe<Float[] | Float>;
+  resetTokenExpiry_not_in?: Maybe<Float[] | Float>;
+  resetTokenExpiry_lt?: Maybe<Float>;
+  resetTokenExpiry_lte?: Maybe<Float>;
+  resetTokenExpiry_gt?: Maybe<Float>;
+  resetTokenExpiry_gte?: Maybe<Float>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  role?: Maybe<Role>;
+  role_not?: Maybe<Role>;
+  role_in?: Maybe<Role[] | Role>;
+  role_not_in?: Maybe<Role[] | Role>;
+  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+}
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface UserUpdateManyDataInput {
+  name?: Maybe<String>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  resetToken?: Maybe<String>;
+  resetTokenExpiry?: Maybe<Float>;
+  role?: Maybe<Role>;
+}
+
+export interface ConversationUpdateManyMutationInput {
+  title?: Maybe<String>;
+}
+
+export interface MessageCreateInput {
+  id?: Maybe<ID_Input>;
+  text: String;
+  user: UserCreateOneInput;
+  conversation: ConversationCreateOneWithoutMessagesInput;
+}
+
+export interface ConversationCreateOneWithoutMessagesInput {
+  create?: Maybe<ConversationCreateWithoutMessagesInput>;
+  connect?: Maybe<ConversationWhereUniqueInput>;
+}
+
+export interface ConversationCreateWithoutMessagesInput {
+  id?: Maybe<ID_Input>;
+  title: String;
+  users?: Maybe<UserCreateManyWithoutConversationsInput>;
+}
+
+export interface MessageUpdateInput {
+  text?: Maybe<String>;
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  conversation?: Maybe<ConversationUpdateOneRequiredWithoutMessagesInput>;
+}
+
+export interface ConversationUpdateOneRequiredWithoutMessagesInput {
+  create?: Maybe<ConversationCreateWithoutMessagesInput>;
+  update?: Maybe<ConversationUpdateWithoutMessagesDataInput>;
+  upsert?: Maybe<ConversationUpsertWithoutMessagesInput>;
+  connect?: Maybe<ConversationWhereUniqueInput>;
+}
+
+export interface ConversationUpdateWithoutMessagesDataInput {
+  title?: Maybe<String>;
+  users?: Maybe<UserUpdateManyWithoutConversationsInput>;
+}
+
+export interface ConversationUpsertWithoutMessagesInput {
+  update: ConversationUpdateWithoutMessagesDataInput;
+  create: ConversationCreateWithoutMessagesInput;
+}
+
+export interface MessageUpdateManyMutationInput {
+  text?: Maybe<String>;
 }
 
 export interface PostCreateInput {
@@ -1028,23 +1803,8 @@ export interface PostCreateInput {
   location: String;
   price: Int;
   owner: UserCreateOneWithoutPostsInput;
-  subcategory: SubCategoryCreateOneInput;
+  subcategory: SubCategoryCreateOneWithoutPostsInput;
   published?: Maybe<Boolean>;
-}
-
-export interface UserCreateOneWithoutPostsInput {
-  create?: Maybe<UserCreateWithoutPostsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserCreateWithoutPostsInput {
-  id?: Maybe<ID_Input>;
-  name: String;
-  email: String;
-  password: String;
-  resetToken?: Maybe<String>;
-  resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
 }
 
 export interface PostUpdateInput {
@@ -1055,29 +1815,8 @@ export interface PostUpdateInput {
   location?: Maybe<String>;
   price?: Maybe<Int>;
   owner?: Maybe<UserUpdateOneRequiredWithoutPostsInput>;
-  subcategory?: Maybe<SubCategoryUpdateOneRequiredInput>;
+  subcategory?: Maybe<SubCategoryUpdateOneRequiredWithoutPostsInput>;
   published?: Maybe<Boolean>;
-}
-
-export interface UserUpdateOneRequiredWithoutPostsInput {
-  create?: Maybe<UserCreateWithoutPostsInput>;
-  update?: Maybe<UserUpdateWithoutPostsDataInput>;
-  upsert?: Maybe<UserUpsertWithoutPostsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserUpdateWithoutPostsDataInput {
-  name?: Maybe<String>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  resetToken?: Maybe<String>;
-  resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
-}
-
-export interface UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput;
-  create: UserCreateWithoutPostsInput;
 }
 
 export interface PostUpdateManyMutationInput {
@@ -1090,9 +1829,17 @@ export interface PostUpdateManyMutationInput {
   published?: Maybe<Boolean>;
 }
 
+export interface SubCategoryCreateInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+  category: CategoryCreateOneWithoutSubcategoriesInput;
+  posts?: Maybe<PostCreateManyWithoutSubcategoryInput>;
+}
+
 export interface SubCategoryUpdateInput {
   name?: Maybe<String>;
-  category?: Maybe<CategoryUpdateOneRequiredInput>;
+  category?: Maybe<CategoryUpdateOneRequiredWithoutSubcategoriesInput>;
+  posts?: Maybe<PostUpdateManyWithoutSubcategoryInput>;
 }
 
 export interface SubCategoryUpdateManyMutationInput {
@@ -1105,8 +1852,9 @@ export interface UserUpdateInput {
   password?: Maybe<String>;
   resetToken?: Maybe<String>;
   resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
   posts?: Maybe<PostUpdateManyWithoutOwnerInput>;
+  conversations?: Maybe<ConversationUpdateManyWithoutUsersInput>;
+  role?: Maybe<Role>;
 }
 
 export interface UserUpdateManyMutationInput {
@@ -1115,7 +1863,7 @@ export interface UserUpdateManyMutationInput {
   password?: Maybe<String>;
   resetToken?: Maybe<String>;
   resetTokenExpiry?: Maybe<Float>;
-  permission?: Maybe<Permission>;
+  role?: Maybe<Role>;
 }
 
 export interface CategorySubscriptionWhereInput {
@@ -1130,6 +1878,23 @@ export interface CategorySubscriptionWhereInput {
   OR?: Maybe<CategorySubscriptionWhereInput[] | CategorySubscriptionWhereInput>;
   NOT?: Maybe<
     CategorySubscriptionWhereInput[] | CategorySubscriptionWhereInput
+  >;
+}
+
+export interface ConversationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<ConversationWhereInput>;
+  AND?: Maybe<
+    ConversationSubscriptionWhereInput[] | ConversationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    ConversationSubscriptionWhereInput[] | ConversationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    ConversationSubscriptionWhereInput[] | ConversationSubscriptionWhereInput
   >;
 }
 
@@ -1195,6 +1960,15 @@ export interface Category {
 export interface CategoryPromise extends Promise<Category>, Fragmentable {
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
+  subcategories: <T = FragmentableArray<SubCategory>>(args?: {
+    where?: SubCategoryWhereInput;
+    orderBy?: SubCategoryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface CategorySubscription
@@ -1202,6 +1976,15 @@ export interface CategorySubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
+  subcategories: <T = Promise<AsyncIterator<SubCategorySubscription>>>(args?: {
+    where?: SubCategoryWhereInput;
+    orderBy?: SubCategoryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface CategoryNullablePromise
@@ -1209,6 +1992,363 @@ export interface CategoryNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
+  subcategories: <T = FragmentableArray<SubCategory>>(args?: {
+    where?: SubCategoryWhereInput;
+    orderBy?: SubCategoryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface SubCategory {
+  id: ID_Output;
+  name: String;
+}
+
+export interface SubCategoryPromise extends Promise<SubCategory>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  category: <T = CategoryPromise>() => T;
+  posts: <T = FragmentableArray<Post>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface SubCategorySubscription
+  extends Promise<AsyncIterator<SubCategory>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  category: <T = CategorySubscription>() => T;
+  posts: <T = Promise<AsyncIterator<PostSubscription>>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface SubCategoryNullablePromise
+  extends Promise<SubCategory | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  category: <T = CategoryPromise>() => T;
+  posts: <T = FragmentableArray<Post>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface Post {
+  id: ID_Output;
+  title: String;
+  description: String;
+  image?: String;
+  imageLarge?: String;
+  location: String;
+  price: Int;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  published: Boolean;
+}
+
+export interface PostPromise extends Promise<Post>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  description: () => Promise<String>;
+  image: () => Promise<String>;
+  imageLarge: () => Promise<String>;
+  location: () => Promise<String>;
+  price: () => Promise<Int>;
+  owner: <T = UserPromise>() => T;
+  subcategory: <T = SubCategoryPromise>() => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  published: () => Promise<Boolean>;
+}
+
+export interface PostSubscription
+  extends Promise<AsyncIterator<Post>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  title: () => Promise<AsyncIterator<String>>;
+  description: () => Promise<AsyncIterator<String>>;
+  image: () => Promise<AsyncIterator<String>>;
+  imageLarge: () => Promise<AsyncIterator<String>>;
+  location: () => Promise<AsyncIterator<String>>;
+  price: () => Promise<AsyncIterator<Int>>;
+  owner: <T = UserSubscription>() => T;
+  subcategory: <T = SubCategorySubscription>() => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  published: () => Promise<AsyncIterator<Boolean>>;
+}
+
+export interface PostNullablePromise
+  extends Promise<Post | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  description: () => Promise<String>;
+  image: () => Promise<String>;
+  imageLarge: () => Promise<String>;
+  location: () => Promise<String>;
+  price: () => Promise<Int>;
+  owner: <T = UserPromise>() => T;
+  subcategory: <T = SubCategoryPromise>() => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  published: () => Promise<Boolean>;
+}
+
+export interface User {
+  id: ID_Output;
+  name: String;
+  email: String;
+  password: String;
+  resetToken?: String;
+  resetTokenExpiry?: Float;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  role: Role;
+}
+
+export interface UserPromise extends Promise<User>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  resetToken: () => Promise<String>;
+  resetTokenExpiry: () => Promise<Float>;
+  posts: <T = FragmentableArray<Post>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  conversations: <T = FragmentableArray<Conversation>>(args?: {
+    where?: ConversationWhereInput;
+    orderBy?: ConversationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  role: () => Promise<Role>;
+}
+
+export interface UserSubscription
+  extends Promise<AsyncIterator<User>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  email: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  resetToken: () => Promise<AsyncIterator<String>>;
+  resetTokenExpiry: () => Promise<AsyncIterator<Float>>;
+  posts: <T = Promise<AsyncIterator<PostSubscription>>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  conversations: <T = Promise<AsyncIterator<ConversationSubscription>>>(args?: {
+    where?: ConversationWhereInput;
+    orderBy?: ConversationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  role: () => Promise<AsyncIterator<Role>>;
+}
+
+export interface UserNullablePromise
+  extends Promise<User | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  resetToken: () => Promise<String>;
+  resetTokenExpiry: () => Promise<Float>;
+  posts: <T = FragmentableArray<Post>>(args?: {
+    where?: PostWhereInput;
+    orderBy?: PostOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  conversations: <T = FragmentableArray<Conversation>>(args?: {
+    where?: ConversationWhereInput;
+    orderBy?: ConversationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  role: () => Promise<Role>;
+}
+
+export interface Conversation {
+  id: ID_Output;
+  title: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface ConversationPromise
+  extends Promise<Conversation>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  users: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  messages: <T = FragmentableArray<Message>>(args?: {
+    where?: MessageWhereInput;
+    orderBy?: MessageOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface ConversationSubscription
+  extends Promise<AsyncIterator<Conversation>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  title: () => Promise<AsyncIterator<String>>;
+  users: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  messages: <T = Promise<AsyncIterator<MessageSubscription>>>(args?: {
+    where?: MessageWhereInput;
+    orderBy?: MessageOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface ConversationNullablePromise
+  extends Promise<Conversation | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  users: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  messages: <T = FragmentableArray<Message>>(args?: {
+    where?: MessageWhereInput;
+    orderBy?: MessageOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface Message {
+  id: ID_Output;
+  text: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface MessagePromise extends Promise<Message>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  text: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  conversation: <T = ConversationPromise>() => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface MessageSubscription
+  extends Promise<AsyncIterator<Message>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  text: () => Promise<AsyncIterator<String>>;
+  user: <T = UserSubscription>() => T;
+  conversation: <T = ConversationSubscription>() => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface MessageNullablePromise
+  extends Promise<Message | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  text: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  conversation: <T = ConversationPromise>() => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface CategoryConnection {
@@ -1290,211 +2430,60 @@ export interface AggregateCategorySubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface Message {
-  id: ID_Output;
-  title: String;
-  content: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+export interface ConversationConnection {
+  pageInfo: PageInfo;
+  edges: ConversationEdge[];
 }
 
-export interface MessagePromise extends Promise<Message>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  content: () => Promise<String>;
-  author: <T = UserPromise>() => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface MessageSubscription
-  extends Promise<AsyncIterator<Message>>,
+export interface ConversationConnectionPromise
+  extends Promise<ConversationConnection>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
-  content: () => Promise<AsyncIterator<String>>;
-  author: <T = UserSubscription>() => T;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<ConversationEdge>>() => T;
+  aggregate: <T = AggregateConversationPromise>() => T;
 }
 
-export interface MessageNullablePromise
-  extends Promise<Message | null>,
+export interface ConversationConnectionSubscription
+  extends Promise<AsyncIterator<ConversationConnection>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  content: () => Promise<String>;
-  author: <T = UserPromise>() => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ConversationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateConversationSubscription>() => T;
 }
 
-export interface User {
-  id: ID_Output;
-  name: String;
-  email: String;
-  password: String;
-  resetToken?: String;
-  resetTokenExpiry?: Float;
-  permission: Permission;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+export interface ConversationEdge {
+  node: Conversation;
+  cursor: String;
 }
 
-export interface UserPromise extends Promise<User>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  resetToken: () => Promise<String>;
-  resetTokenExpiry: () => Promise<Float>;
-  permission: () => Promise<Permission>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  posts: <T = FragmentableArray<Post>>(args?: {
-    where?: PostWhereInput;
-    orderBy?: PostOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-}
-
-export interface UserSubscription
-  extends Promise<AsyncIterator<User>>,
+export interface ConversationEdgePromise
+  extends Promise<ConversationEdge>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  resetToken: () => Promise<AsyncIterator<String>>;
-  resetTokenExpiry: () => Promise<AsyncIterator<Float>>;
-  permission: () => Promise<AsyncIterator<Permission>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  posts: <T = Promise<AsyncIterator<PostSubscription>>>(args?: {
-    where?: PostWhereInput;
-    orderBy?: PostOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
+  node: <T = ConversationPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface UserNullablePromise
-  extends Promise<User | null>,
+export interface ConversationEdgeSubscription
+  extends Promise<AsyncIterator<ConversationEdge>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  resetToken: () => Promise<String>;
-  resetTokenExpiry: () => Promise<Float>;
-  permission: () => Promise<Permission>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  posts: <T = FragmentableArray<Post>>(args?: {
-    where?: PostWhereInput;
-    orderBy?: PostOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
+  node: <T = ConversationSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface Post {
-  id: ID_Output;
-  title: String;
-  description: String;
-  image?: String;
-  imageLarge?: String;
-  location: String;
-  price: Int;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  published: Boolean;
+export interface AggregateConversation {
+  count: Int;
 }
 
-export interface PostPromise extends Promise<Post>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  description: () => Promise<String>;
-  image: () => Promise<String>;
-  imageLarge: () => Promise<String>;
-  location: () => Promise<String>;
-  price: () => Promise<Int>;
-  owner: <T = UserPromise>() => T;
-  subcategory: <T = SubCategoryPromise>() => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  published: () => Promise<Boolean>;
-}
-
-export interface PostSubscription
-  extends Promise<AsyncIterator<Post>>,
+export interface AggregateConversationPromise
+  extends Promise<AggregateConversation>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
-  description: () => Promise<AsyncIterator<String>>;
-  image: () => Promise<AsyncIterator<String>>;
-  imageLarge: () => Promise<AsyncIterator<String>>;
-  location: () => Promise<AsyncIterator<String>>;
-  price: () => Promise<AsyncIterator<Int>>;
-  owner: <T = UserSubscription>() => T;
-  subcategory: <T = SubCategorySubscription>() => T;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  published: () => Promise<AsyncIterator<Boolean>>;
+  count: () => Promise<Int>;
 }
 
-export interface PostNullablePromise
-  extends Promise<Post | null>,
+export interface AggregateConversationSubscription
+  extends Promise<AsyncIterator<AggregateConversation>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  description: () => Promise<String>;
-  image: () => Promise<String>;
-  imageLarge: () => Promise<String>;
-  location: () => Promise<String>;
-  price: () => Promise<Int>;
-  owner: <T = UserPromise>() => T;
-  subcategory: <T = SubCategoryPromise>() => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  published: () => Promise<Boolean>;
-}
-
-export interface SubCategory {
-  id: ID_Output;
-  name: String;
-}
-
-export interface SubCategoryPromise extends Promise<SubCategory>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  category: <T = CategoryPromise>() => T;
-}
-
-export interface SubCategorySubscription
-  extends Promise<AsyncIterator<SubCategory>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-  category: <T = CategorySubscription>() => T;
-}
-
-export interface SubCategoryNullablePromise
-  extends Promise<SubCategory | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  category: <T = CategoryPromise>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface MessageConnection {
@@ -1775,6 +2764,56 @@ export interface CategoryPreviousValuesSubscription
   name: () => Promise<AsyncIterator<String>>;
 }
 
+export interface ConversationSubscriptionPayload {
+  mutation: MutationType;
+  node: Conversation;
+  updatedFields: String[];
+  previousValues: ConversationPreviousValues;
+}
+
+export interface ConversationSubscriptionPayloadPromise
+  extends Promise<ConversationSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = ConversationPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ConversationPreviousValuesPromise>() => T;
+}
+
+export interface ConversationSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ConversationSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ConversationSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ConversationPreviousValuesSubscription>() => T;
+}
+
+export interface ConversationPreviousValues {
+  id: ID_Output;
+  title: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface ConversationPreviousValuesPromise
+  extends Promise<ConversationPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface ConversationPreviousValuesSubscription
+  extends Promise<AsyncIterator<ConversationPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  title: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
 export interface MessageSubscriptionPayload {
   mutation: MutationType;
   node: Message;
@@ -1802,8 +2841,7 @@ export interface MessageSubscriptionPayloadSubscription
 
 export interface MessagePreviousValues {
   id: ID_Output;
-  title: String;
-  content: String;
+  text: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -1812,8 +2850,7 @@ export interface MessagePreviousValuesPromise
   extends Promise<MessagePreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  content: () => Promise<String>;
+  text: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -1822,8 +2859,7 @@ export interface MessagePreviousValuesSubscription
   extends Promise<AsyncIterator<MessagePreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
-  content: () => Promise<AsyncIterator<String>>;
+  text: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -1972,9 +3008,9 @@ export interface UserPreviousValues {
   password: String;
   resetToken?: String;
   resetTokenExpiry?: Float;
-  permission: Permission;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  role: Role;
 }
 
 export interface UserPreviousValuesPromise
@@ -1986,9 +3022,9 @@ export interface UserPreviousValuesPromise
   password: () => Promise<String>;
   resetToken: () => Promise<String>;
   resetTokenExpiry: () => Promise<Float>;
-  permission: () => Promise<Permission>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  role: () => Promise<Role>;
 }
 
 export interface UserPreviousValuesSubscription
@@ -2000,9 +3036,9 @@ export interface UserPreviousValuesSubscription
   password: () => Promise<AsyncIterator<String>>;
   resetToken: () => Promise<AsyncIterator<String>>;
   resetTokenExpiry: () => Promise<AsyncIterator<Float>>;
-  permission: () => Promise<AsyncIterator<Permission>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  role: () => Promise<AsyncIterator<Role>>;
 }
 
 /*
@@ -2022,11 +3058,6 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 export type Int = number;
 
 /*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean;
-
-/*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
 */
 export type Float = number;
@@ -2041,6 +3072,11 @@ DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
 
+/*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean;
+
 export type Long = string;
 
 /**
@@ -2049,7 +3085,7 @@ export type Long = string;
 
 export const models: Model[] = [
   {
-    name: "Permission",
+    name: "Role",
     embedded: false
   },
   {
@@ -2066,6 +3102,10 @@ export const models: Model[] = [
   },
   {
     name: "Post",
+    embedded: false
+  },
+  {
+    name: "Conversation",
     embedded: false
   },
   {

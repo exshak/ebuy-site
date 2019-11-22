@@ -1,4 +1,4 @@
-import { Context } from "../utils";
+import { Context } from '../utils';
 
 export const User = {
   posts: ({ id }, args, ctx: Context) => {

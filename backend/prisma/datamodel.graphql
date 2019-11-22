@@ -1,4 +1,4 @@
-enum Permission {
+enum Role {
   USER
   ADMIN
 }
@@ -10,22 +10,24 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission! @default(value: USER)
+  posts: [Post!]!
+  conversations: [Conversation!]!
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  # messages: [Message!]!
-  posts: [Post!]!
+  role: Role! @default(value: USER)
 }
 
 type Category {
   id: ID! @id
   name: String!
+  subcategories: [SubCategory!]!
 }
 
 type SubCategory {
   id: ID! @id
   name: String!
   category: Category!
+  posts: [Post!]!
 }
 
 type Post {
@@ -43,11 +45,20 @@ type Post {
   published: Boolean! @default(value: false)
 }
 
-type Message {
+type Conversation {
   id: ID! @id
   title: String!
-  content: String!
-  author: User!
+  users: [User!]!
+  messages: [Message!]!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type Message {
+  id: ID! @id
+  text: String!
+  user: User!
+  conversation: Conversation!
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 }

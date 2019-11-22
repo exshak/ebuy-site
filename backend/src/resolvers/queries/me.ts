@@ -1,4 +1,4 @@
-import { Context, getUserId } from "../../utils";
+import { Context, getUserId } from '../../utils';
 
 export const me = {
   me(parent, args, ctx: Context) {

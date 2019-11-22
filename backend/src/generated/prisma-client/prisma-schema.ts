@@ -6,6 +6,10 @@ export const typeDefs = /* GraphQL */ `type AggregateCategory {
   count: Int!
 }
 
+type AggregateConversation {
+  count: Int!
+}
+
 type AggregateMessage {
   count: Int!
 }
@@ -29,6 +33,7 @@ type BatchPayload {
 type Category {
   id: ID!
   name: String!
+  subcategories(where: SubCategoryWhereInput, orderBy: SubCategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [SubCategory!]
 }
 
 type CategoryConnection {
@@ -40,11 +45,17 @@ type CategoryConnection {
 input CategoryCreateInput {
   id: ID
   name: String!
+  subcategories: SubCategoryCreateManyWithoutCategoryInput
 }
 
-input CategoryCreateOneInput {
-  create: CategoryCreateInput
+input CategoryCreateOneWithoutSubcategoriesInput {
+  create: CategoryCreateWithoutSubcategoriesInput
   connect: CategoryWhereUniqueInput
+}
+
+input CategoryCreateWithoutSubcategoriesInput {
+  id: ID
+  name: String!
 }
 
 type CategoryEdge {
@@ -82,28 +93,29 @@ input CategorySubscriptionWhereInput {
   NOT: [CategorySubscriptionWhereInput!]
 }
 
-input CategoryUpdateDataInput {
-  name: String
-}
-
 input CategoryUpdateInput {
   name: String
+  subcategories: SubCategoryUpdateManyWithoutCategoryInput
 }
 
 input CategoryUpdateManyMutationInput {
   name: String
 }
 
-input CategoryUpdateOneRequiredInput {
-  create: CategoryCreateInput
-  update: CategoryUpdateDataInput
-  upsert: CategoryUpsertNestedInput
+input CategoryUpdateOneRequiredWithoutSubcategoriesInput {
+  create: CategoryCreateWithoutSubcategoriesInput
+  update: CategoryUpdateWithoutSubcategoriesDataInput
+  upsert: CategoryUpsertWithoutSubcategoriesInput
   connect: CategoryWhereUniqueInput
 }
 
-input CategoryUpsertNestedInput {
-  update: CategoryUpdateDataInput!
-  create: CategoryCreateInput!
+input CategoryUpdateWithoutSubcategoriesDataInput {
+  name: String
+}
+
+input CategoryUpsertWithoutSubcategoriesInput {
+  update: CategoryUpdateWithoutSubcategoriesDataInput!
+  create: CategoryCreateWithoutSubcategoriesInput!
 }
 
 input CategoryWhereInput {
@@ -135,6 +147,9 @@ input CategoryWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  subcategories_every: SubCategoryWhereInput
+  subcategories_some: SubCategoryWhereInput
+  subcategories_none: SubCategoryWhereInput
   AND: [CategoryWhereInput!]
   OR: [CategoryWhereInput!]
   NOT: [CategoryWhereInput!]
@@ -144,88 +159,74 @@ input CategoryWhereUniqueInput {
   id: ID
 }
 
-scalar DateTime
-
-scalar Long
-
-type Message {
+type Conversation {
   id: ID!
   title: String!
-  content: String!
-  author: User!
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-type MessageConnection {
+type ConversationConnection {
   pageInfo: PageInfo!
-  edges: [MessageEdge]!
-  aggregate: AggregateMessage!
+  edges: [ConversationEdge]!
+  aggregate: AggregateConversation!
 }
 
-input MessageCreateInput {
+input ConversationCreateInput {
   id: ID
   title: String!
-  content: String!
-  author: UserCreateOneInput!
+  users: UserCreateManyWithoutConversationsInput
+  messages: MessageCreateManyWithoutConversationInput
 }
 
-type MessageEdge {
-  node: Message!
+input ConversationCreateManyWithoutUsersInput {
+  create: [ConversationCreateWithoutUsersInput!]
+  connect: [ConversationWhereUniqueInput!]
+}
+
+input ConversationCreateOneWithoutMessagesInput {
+  create: ConversationCreateWithoutMessagesInput
+  connect: ConversationWhereUniqueInput
+}
+
+input ConversationCreateWithoutMessagesInput {
+  id: ID
+  title: String!
+  users: UserCreateManyWithoutConversationsInput
+}
+
+input ConversationCreateWithoutUsersInput {
+  id: ID
+  title: String!
+  messages: MessageCreateManyWithoutConversationInput
+}
+
+type ConversationEdge {
+  node: Conversation!
   cursor: String!
 }
 
-enum MessageOrderByInput {
+enum ConversationOrderByInput {
   id_ASC
   id_DESC
   title_ASC
   title_DESC
-  content_ASC
-  content_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
 }
 
-type MessagePreviousValues {
+type ConversationPreviousValues {
   id: ID!
   title: String!
-  content: String!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-type MessageSubscriptionPayload {
-  mutation: MutationType!
-  node: Message
-  updatedFields: [String!]
-  previousValues: MessagePreviousValues
-}
-
-input MessageSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: MessageWhereInput
-  AND: [MessageSubscriptionWhereInput!]
-  OR: [MessageSubscriptionWhereInput!]
-  NOT: [MessageSubscriptionWhereInput!]
-}
-
-input MessageUpdateInput {
-  title: String
-  content: String
-  author: UserUpdateOneRequiredInput
-}
-
-input MessageUpdateManyMutationInput {
-  title: String
-  content: String
-}
-
-input MessageWhereInput {
+input ConversationScalarWhereInput {
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -254,21 +255,375 @@ input MessageWhereInput {
   title_not_starts_with: String
   title_ends_with: String
   title_not_ends_with: String
-  content: String
-  content_not: String
-  content_in: [String!]
-  content_not_in: [String!]
-  content_lt: String
-  content_lte: String
-  content_gt: String
-  content_gte: String
-  content_contains: String
-  content_not_contains: String
-  content_starts_with: String
-  content_not_starts_with: String
-  content_ends_with: String
-  content_not_ends_with: String
-  author: UserWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [ConversationScalarWhereInput!]
+  OR: [ConversationScalarWhereInput!]
+  NOT: [ConversationScalarWhereInput!]
+}
+
+type ConversationSubscriptionPayload {
+  mutation: MutationType!
+  node: Conversation
+  updatedFields: [String!]
+  previousValues: ConversationPreviousValues
+}
+
+input ConversationSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ConversationWhereInput
+  AND: [ConversationSubscriptionWhereInput!]
+  OR: [ConversationSubscriptionWhereInput!]
+  NOT: [ConversationSubscriptionWhereInput!]
+}
+
+input ConversationUpdateInput {
+  title: String
+  users: UserUpdateManyWithoutConversationsInput
+  messages: MessageUpdateManyWithoutConversationInput
+}
+
+input ConversationUpdateManyDataInput {
+  title: String
+}
+
+input ConversationUpdateManyMutationInput {
+  title: String
+}
+
+input ConversationUpdateManyWithoutUsersInput {
+  create: [ConversationCreateWithoutUsersInput!]
+  delete: [ConversationWhereUniqueInput!]
+  connect: [ConversationWhereUniqueInput!]
+  set: [ConversationWhereUniqueInput!]
+  disconnect: [ConversationWhereUniqueInput!]
+  update: [ConversationUpdateWithWhereUniqueWithoutUsersInput!]
+  upsert: [ConversationUpsertWithWhereUniqueWithoutUsersInput!]
+  deleteMany: [ConversationScalarWhereInput!]
+  updateMany: [ConversationUpdateManyWithWhereNestedInput!]
+}
+
+input ConversationUpdateManyWithWhereNestedInput {
+  where: ConversationScalarWhereInput!
+  data: ConversationUpdateManyDataInput!
+}
+
+input ConversationUpdateOneRequiredWithoutMessagesInput {
+  create: ConversationCreateWithoutMessagesInput
+  update: ConversationUpdateWithoutMessagesDataInput
+  upsert: ConversationUpsertWithoutMessagesInput
+  connect: ConversationWhereUniqueInput
+}
+
+input ConversationUpdateWithoutMessagesDataInput {
+  title: String
+  users: UserUpdateManyWithoutConversationsInput
+}
+
+input ConversationUpdateWithoutUsersDataInput {
+  title: String
+  messages: MessageUpdateManyWithoutConversationInput
+}
+
+input ConversationUpdateWithWhereUniqueWithoutUsersInput {
+  where: ConversationWhereUniqueInput!
+  data: ConversationUpdateWithoutUsersDataInput!
+}
+
+input ConversationUpsertWithoutMessagesInput {
+  update: ConversationUpdateWithoutMessagesDataInput!
+  create: ConversationCreateWithoutMessagesInput!
+}
+
+input ConversationUpsertWithWhereUniqueWithoutUsersInput {
+  where: ConversationWhereUniqueInput!
+  update: ConversationUpdateWithoutUsersDataInput!
+  create: ConversationCreateWithoutUsersInput!
+}
+
+input ConversationWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  users_every: UserWhereInput
+  users_some: UserWhereInput
+  users_none: UserWhereInput
+  messages_every: MessageWhereInput
+  messages_some: MessageWhereInput
+  messages_none: MessageWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [ConversationWhereInput!]
+  OR: [ConversationWhereInput!]
+  NOT: [ConversationWhereInput!]
+}
+
+input ConversationWhereUniqueInput {
+  id: ID
+}
+
+scalar DateTime
+
+scalar Long
+
+type Message {
+  id: ID!
+  text: String!
+  user: User!
+  conversation: Conversation!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type MessageConnection {
+  pageInfo: PageInfo!
+  edges: [MessageEdge]!
+  aggregate: AggregateMessage!
+}
+
+input MessageCreateInput {
+  id: ID
+  text: String!
+  user: UserCreateOneInput!
+  conversation: ConversationCreateOneWithoutMessagesInput!
+}
+
+input MessageCreateManyWithoutConversationInput {
+  create: [MessageCreateWithoutConversationInput!]
+  connect: [MessageWhereUniqueInput!]
+}
+
+input MessageCreateWithoutConversationInput {
+  id: ID
+  text: String!
+  user: UserCreateOneInput!
+}
+
+type MessageEdge {
+  node: Message!
+  cursor: String!
+}
+
+enum MessageOrderByInput {
+  id_ASC
+  id_DESC
+  text_ASC
+  text_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type MessagePreviousValues {
+  id: ID!
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input MessageScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  text: String
+  text_not: String
+  text_in: [String!]
+  text_not_in: [String!]
+  text_lt: String
+  text_lte: String
+  text_gt: String
+  text_gte: String
+  text_contains: String
+  text_not_contains: String
+  text_starts_with: String
+  text_not_starts_with: String
+  text_ends_with: String
+  text_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [MessageScalarWhereInput!]
+  OR: [MessageScalarWhereInput!]
+  NOT: [MessageScalarWhereInput!]
+}
+
+type MessageSubscriptionPayload {
+  mutation: MutationType!
+  node: Message
+  updatedFields: [String!]
+  previousValues: MessagePreviousValues
+}
+
+input MessageSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: MessageWhereInput
+  AND: [MessageSubscriptionWhereInput!]
+  OR: [MessageSubscriptionWhereInput!]
+  NOT: [MessageSubscriptionWhereInput!]
+}
+
+input MessageUpdateInput {
+  text: String
+  user: UserUpdateOneRequiredInput
+  conversation: ConversationUpdateOneRequiredWithoutMessagesInput
+}
+
+input MessageUpdateManyDataInput {
+  text: String
+}
+
+input MessageUpdateManyMutationInput {
+  text: String
+}
+
+input MessageUpdateManyWithoutConversationInput {
+  create: [MessageCreateWithoutConversationInput!]
+  delete: [MessageWhereUniqueInput!]
+  connect: [MessageWhereUniqueInput!]
+  set: [MessageWhereUniqueInput!]
+  disconnect: [MessageWhereUniqueInput!]
+  update: [MessageUpdateWithWhereUniqueWithoutConversationInput!]
+  upsert: [MessageUpsertWithWhereUniqueWithoutConversationInput!]
+  deleteMany: [MessageScalarWhereInput!]
+  updateMany: [MessageUpdateManyWithWhereNestedInput!]
+}
+
+input MessageUpdateManyWithWhereNestedInput {
+  where: MessageScalarWhereInput!
+  data: MessageUpdateManyDataInput!
+}
+
+input MessageUpdateWithoutConversationDataInput {
+  text: String
+  user: UserUpdateOneRequiredInput
+}
+
+input MessageUpdateWithWhereUniqueWithoutConversationInput {
+  where: MessageWhereUniqueInput!
+  data: MessageUpdateWithoutConversationDataInput!
+}
+
+input MessageUpsertWithWhereUniqueWithoutConversationInput {
+  where: MessageWhereUniqueInput!
+  update: MessageUpdateWithoutConversationDataInput!
+  create: MessageCreateWithoutConversationInput!
+}
+
+input MessageWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  text: String
+  text_not: String
+  text_in: [String!]
+  text_not_in: [String!]
+  text_lt: String
+  text_lte: String
+  text_gt: String
+  text_gte: String
+  text_contains: String
+  text_not_contains: String
+  text_starts_with: String
+  text_not_starts_with: String
+  text_ends_with: String
+  text_not_ends_with: String
+  user: UserWhereInput
+  conversation: ConversationWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -301,6 +656,12 @@ type Mutation {
   upsertCategory(where: CategoryWhereUniqueInput!, create: CategoryCreateInput!, update: CategoryUpdateInput!): Category!
   deleteCategory(where: CategoryWhereUniqueInput!): Category
   deleteManyCategories(where: CategoryWhereInput): BatchPayload!
+  createConversation(data: ConversationCreateInput!): Conversation!
+  updateConversation(data: ConversationUpdateInput!, where: ConversationWhereUniqueInput!): Conversation
+  updateManyConversations(data: ConversationUpdateManyMutationInput!, where: ConversationWhereInput): BatchPayload!
+  upsertConversation(where: ConversationWhereUniqueInput!, create: ConversationCreateInput!, update: ConversationUpdateInput!): Conversation!
+  deleteConversation(where: ConversationWhereUniqueInput!): Conversation
+  deleteManyConversations(where: ConversationWhereInput): BatchPayload!
   createMessage(data: MessageCreateInput!): Message!
   updateMessage(data: MessageUpdateInput!, where: MessageWhereUniqueInput!): Message
   updateManyMessages(data: MessageUpdateManyMutationInput!, where: MessageWhereInput): BatchPayload!
@@ -344,11 +705,6 @@ type PageInfo {
   endCursor: String
 }
 
-enum Permission {
-  USER
-  ADMIN
-}
-
 type Post {
   id: ID!
   title: String!
@@ -379,12 +735,17 @@ input PostCreateInput {
   location: String!
   price: Int!
   owner: UserCreateOneWithoutPostsInput!
-  subcategory: SubCategoryCreateOneInput!
+  subcategory: SubCategoryCreateOneWithoutPostsInput!
   published: Boolean
 }
 
 input PostCreateManyWithoutOwnerInput {
   create: [PostCreateWithoutOwnerInput!]
+  connect: [PostWhereUniqueInput!]
+}
+
+input PostCreateManyWithoutSubcategoryInput {
+  create: [PostCreateWithoutSubcategoryInput!]
   connect: [PostWhereUniqueInput!]
 }
 
@@ -396,7 +757,19 @@ input PostCreateWithoutOwnerInput {
   imageLarge: String
   location: String!
   price: Int!
-  subcategory: SubCategoryCreateOneInput!
+  subcategory: SubCategoryCreateOneWithoutPostsInput!
+  published: Boolean
+}
+
+input PostCreateWithoutSubcategoryInput {
+  id: ID
+  title: String!
+  description: String!
+  image: String
+  imageLarge: String
+  location: String!
+  price: Int!
+  owner: UserCreateOneWithoutPostsInput!
   published: Boolean
 }
 
@@ -583,7 +956,7 @@ input PostUpdateInput {
   location: String
   price: Int
   owner: UserUpdateOneRequiredWithoutPostsInput
-  subcategory: SubCategoryUpdateOneRequiredInput
+  subcategory: SubCategoryUpdateOneRequiredWithoutPostsInput
   published: Boolean
 }
 
@@ -619,6 +992,18 @@ input PostUpdateManyWithoutOwnerInput {
   updateMany: [PostUpdateManyWithWhereNestedInput!]
 }
 
+input PostUpdateManyWithoutSubcategoryInput {
+  create: [PostCreateWithoutSubcategoryInput!]
+  delete: [PostWhereUniqueInput!]
+  connect: [PostWhereUniqueInput!]
+  set: [PostWhereUniqueInput!]
+  disconnect: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutSubcategoryInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutSubcategoryInput!]
+  deleteMany: [PostScalarWhereInput!]
+  updateMany: [PostUpdateManyWithWhereNestedInput!]
+}
+
 input PostUpdateManyWithWhereNestedInput {
   where: PostScalarWhereInput!
   data: PostUpdateManyDataInput!
@@ -631,7 +1016,18 @@ input PostUpdateWithoutOwnerDataInput {
   imageLarge: String
   location: String
   price: Int
-  subcategory: SubCategoryUpdateOneRequiredInput
+  subcategory: SubCategoryUpdateOneRequiredWithoutPostsInput
+  published: Boolean
+}
+
+input PostUpdateWithoutSubcategoryDataInput {
+  title: String
+  description: String
+  image: String
+  imageLarge: String
+  location: String
+  price: Int
+  owner: UserUpdateOneRequiredWithoutPostsInput
   published: Boolean
 }
 
@@ -640,10 +1036,21 @@ input PostUpdateWithWhereUniqueWithoutOwnerInput {
   data: PostUpdateWithoutOwnerDataInput!
 }
 
+input PostUpdateWithWhereUniqueWithoutSubcategoryInput {
+  where: PostWhereUniqueInput!
+  data: PostUpdateWithoutSubcategoryDataInput!
+}
+
 input PostUpsertWithWhereUniqueWithoutOwnerInput {
   where: PostWhereUniqueInput!
   update: PostUpdateWithoutOwnerDataInput!
   create: PostCreateWithoutOwnerInput!
+}
+
+input PostUpsertWithWhereUniqueWithoutSubcategoryInput {
+  where: PostWhereUniqueInput!
+  update: PostUpdateWithoutSubcategoryDataInput!
+  create: PostCreateWithoutSubcategoryInput!
 }
 
 input PostWhereInput {
@@ -772,6 +1179,9 @@ type Query {
   category(where: CategoryWhereUniqueInput!): Category
   categories(where: CategoryWhereInput, orderBy: CategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Category]!
   categoriesConnection(where: CategoryWhereInput, orderBy: CategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CategoryConnection!
+  conversation(where: ConversationWhereUniqueInput!): Conversation
+  conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation]!
+  conversationsConnection(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConversationConnection!
   message(where: MessageWhereUniqueInput!): Message
   messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message]!
   messagesConnection(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MessageConnection!
@@ -787,10 +1197,16 @@ type Query {
   node(id: ID!): Node
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 type SubCategory {
   id: ID!
   name: String!
   category: Category!
+  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
 }
 
 type SubCategoryConnection {
@@ -802,12 +1218,30 @@ type SubCategoryConnection {
 input SubCategoryCreateInput {
   id: ID
   name: String!
-  category: CategoryCreateOneInput!
+  category: CategoryCreateOneWithoutSubcategoriesInput!
+  posts: PostCreateManyWithoutSubcategoryInput
 }
 
-input SubCategoryCreateOneInput {
-  create: SubCategoryCreateInput
+input SubCategoryCreateManyWithoutCategoryInput {
+  create: [SubCategoryCreateWithoutCategoryInput!]
+  connect: [SubCategoryWhereUniqueInput!]
+}
+
+input SubCategoryCreateOneWithoutPostsInput {
+  create: SubCategoryCreateWithoutPostsInput
   connect: SubCategoryWhereUniqueInput
+}
+
+input SubCategoryCreateWithoutCategoryInput {
+  id: ID
+  name: String!
+  posts: PostCreateManyWithoutSubcategoryInput
+}
+
+input SubCategoryCreateWithoutPostsInput {
+  id: ID
+  name: String!
+  category: CategoryCreateOneWithoutSubcategoriesInput!
 }
 
 type SubCategoryEdge {
@@ -825,6 +1259,40 @@ enum SubCategoryOrderByInput {
 type SubCategoryPreviousValues {
   id: ID!
   name: String!
+}
+
+input SubCategoryScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  AND: [SubCategoryScalarWhereInput!]
+  OR: [SubCategoryScalarWhereInput!]
+  NOT: [SubCategoryScalarWhereInput!]
 }
 
 type SubCategorySubscriptionPayload {
@@ -845,30 +1313,68 @@ input SubCategorySubscriptionWhereInput {
   NOT: [SubCategorySubscriptionWhereInput!]
 }
 
-input SubCategoryUpdateDataInput {
-  name: String
-  category: CategoryUpdateOneRequiredInput
-}
-
 input SubCategoryUpdateInput {
   name: String
-  category: CategoryUpdateOneRequiredInput
+  category: CategoryUpdateOneRequiredWithoutSubcategoriesInput
+  posts: PostUpdateManyWithoutSubcategoryInput
+}
+
+input SubCategoryUpdateManyDataInput {
+  name: String
 }
 
 input SubCategoryUpdateManyMutationInput {
   name: String
 }
 
-input SubCategoryUpdateOneRequiredInput {
-  create: SubCategoryCreateInput
-  update: SubCategoryUpdateDataInput
-  upsert: SubCategoryUpsertNestedInput
+input SubCategoryUpdateManyWithoutCategoryInput {
+  create: [SubCategoryCreateWithoutCategoryInput!]
+  delete: [SubCategoryWhereUniqueInput!]
+  connect: [SubCategoryWhereUniqueInput!]
+  set: [SubCategoryWhereUniqueInput!]
+  disconnect: [SubCategoryWhereUniqueInput!]
+  update: [SubCategoryUpdateWithWhereUniqueWithoutCategoryInput!]
+  upsert: [SubCategoryUpsertWithWhereUniqueWithoutCategoryInput!]
+  deleteMany: [SubCategoryScalarWhereInput!]
+  updateMany: [SubCategoryUpdateManyWithWhereNestedInput!]
+}
+
+input SubCategoryUpdateManyWithWhereNestedInput {
+  where: SubCategoryScalarWhereInput!
+  data: SubCategoryUpdateManyDataInput!
+}
+
+input SubCategoryUpdateOneRequiredWithoutPostsInput {
+  create: SubCategoryCreateWithoutPostsInput
+  update: SubCategoryUpdateWithoutPostsDataInput
+  upsert: SubCategoryUpsertWithoutPostsInput
   connect: SubCategoryWhereUniqueInput
 }
 
-input SubCategoryUpsertNestedInput {
-  update: SubCategoryUpdateDataInput!
-  create: SubCategoryCreateInput!
+input SubCategoryUpdateWithoutCategoryDataInput {
+  name: String
+  posts: PostUpdateManyWithoutSubcategoryInput
+}
+
+input SubCategoryUpdateWithoutPostsDataInput {
+  name: String
+  category: CategoryUpdateOneRequiredWithoutSubcategoriesInput
+}
+
+input SubCategoryUpdateWithWhereUniqueWithoutCategoryInput {
+  where: SubCategoryWhereUniqueInput!
+  data: SubCategoryUpdateWithoutCategoryDataInput!
+}
+
+input SubCategoryUpsertWithoutPostsInput {
+  update: SubCategoryUpdateWithoutPostsDataInput!
+  create: SubCategoryCreateWithoutPostsInput!
+}
+
+input SubCategoryUpsertWithWhereUniqueWithoutCategoryInput {
+  where: SubCategoryWhereUniqueInput!
+  update: SubCategoryUpdateWithoutCategoryDataInput!
+  create: SubCategoryCreateWithoutCategoryInput!
 }
 
 input SubCategoryWhereInput {
@@ -901,6 +1407,9 @@ input SubCategoryWhereInput {
   name_ends_with: String
   name_not_ends_with: String
   category: CategoryWhereInput
+  posts_every: PostWhereInput
+  posts_some: PostWhereInput
+  posts_none: PostWhereInput
   AND: [SubCategoryWhereInput!]
   OR: [SubCategoryWhereInput!]
   NOT: [SubCategoryWhereInput!]
@@ -912,6 +1421,7 @@ input SubCategoryWhereUniqueInput {
 
 type Subscription {
   category(where: CategorySubscriptionWhereInput): CategorySubscriptionPayload
+  conversation(where: ConversationSubscriptionWhereInput): ConversationSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   subCategory(where: SubCategorySubscriptionWhereInput): SubCategorySubscriptionPayload
@@ -925,10 +1435,11 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission!
+  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  conversations(where: ConversationWhereInput, orderBy: ConversationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Conversation!]
   createdAt: DateTime!
   updatedAt: DateTime!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  role: Role!
 }
 
 type UserConnection {
@@ -944,8 +1455,14 @@ input UserCreateInput {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
   posts: PostCreateManyWithoutOwnerInput
+  conversations: ConversationCreateManyWithoutUsersInput
+  role: Role
+}
+
+input UserCreateManyWithoutConversationsInput {
+  create: [UserCreateWithoutConversationsInput!]
+  connect: [UserWhereUniqueInput!]
 }
 
 input UserCreateOneInput {
@@ -958,6 +1475,17 @@ input UserCreateOneWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateWithoutConversationsInput {
+  id: ID
+  name: String!
+  email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  posts: PostCreateManyWithoutOwnerInput
+  role: Role
+}
+
 input UserCreateWithoutPostsInput {
   id: ID
   name: String!
@@ -965,7 +1493,8 @@ input UserCreateWithoutPostsInput {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
+  conversations: ConversationCreateManyWithoutUsersInput
+  role: Role
 }
 
 type UserEdge {
@@ -986,12 +1515,12 @@ enum UserOrderByInput {
   resetToken_DESC
   resetTokenExpiry_ASC
   resetTokenExpiry_DESC
-  permission_ASC
-  permission_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  role_ASC
+  role_DESC
 }
 
 type UserPreviousValues {
@@ -1001,9 +1530,113 @@ type UserPreviousValues {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission!
   createdAt: DateTime!
   updatedAt: DateTime!
+  role: Role!
+}
+
+input UserScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  resetToken: String
+  resetToken_not: String
+  resetToken_in: [String!]
+  resetToken_not_in: [String!]
+  resetToken_lt: String
+  resetToken_lte: String
+  resetToken_gt: String
+  resetToken_gte: String
+  resetToken_contains: String
+  resetToken_not_contains: String
+  resetToken_starts_with: String
+  resetToken_not_starts_with: String
+  resetToken_ends_with: String
+  resetToken_not_ends_with: String
+  resetTokenExpiry: Float
+  resetTokenExpiry_not: Float
+  resetTokenExpiry_in: [Float!]
+  resetTokenExpiry_not_in: [Float!]
+  resetTokenExpiry_lt: Float
+  resetTokenExpiry_lte: Float
+  resetTokenExpiry_gt: Float
+  resetTokenExpiry_gte: Float
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  role: Role
+  role_not: Role
+  role_in: [Role!]
+  role_not_in: [Role!]
+  AND: [UserScalarWhereInput!]
+  OR: [UserScalarWhereInput!]
+  NOT: [UserScalarWhereInput!]
 }
 
 type UserSubscriptionPayload {
@@ -1030,8 +1663,9 @@ input UserUpdateDataInput {
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
   posts: PostUpdateManyWithoutOwnerInput
+  conversations: ConversationUpdateManyWithoutUsersInput
+  role: Role
 }
 
 input UserUpdateInput {
@@ -1040,8 +1674,18 @@ input UserUpdateInput {
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
   posts: PostUpdateManyWithoutOwnerInput
+  conversations: ConversationUpdateManyWithoutUsersInput
+  role: Role
+}
+
+input UserUpdateManyDataInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  role: Role
 }
 
 input UserUpdateManyMutationInput {
@@ -1050,7 +1694,24 @@ input UserUpdateManyMutationInput {
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
+  role: Role
+}
+
+input UserUpdateManyWithoutConversationsInput {
+  create: [UserCreateWithoutConversationsInput!]
+  delete: [UserWhereUniqueInput!]
+  connect: [UserWhereUniqueInput!]
+  set: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueWithoutConversationsInput!]
+  upsert: [UserUpsertWithWhereUniqueWithoutConversationsInput!]
+  deleteMany: [UserScalarWhereInput!]
+  updateMany: [UserUpdateManyWithWhereNestedInput!]
+}
+
+input UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput!
+  data: UserUpdateManyDataInput!
 }
 
 input UserUpdateOneRequiredInput {
@@ -1067,13 +1728,29 @@ input UserUpdateOneRequiredWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserUpdateWithoutConversationsDataInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  posts: PostUpdateManyWithoutOwnerInput
+  role: Role
+}
+
 input UserUpdateWithoutPostsDataInput {
   name: String
   email: String
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: Permission
+  conversations: ConversationUpdateManyWithoutUsersInput
+  role: Role
+}
+
+input UserUpdateWithWhereUniqueWithoutConversationsInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutConversationsDataInput!
 }
 
 input UserUpsertNestedInput {
@@ -1084,6 +1761,12 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutPostsInput {
   update: UserUpdateWithoutPostsDataInput!
   create: UserCreateWithoutPostsInput!
+}
+
+input UserUpsertWithWhereUniqueWithoutConversationsInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutConversationsDataInput!
+  create: UserCreateWithoutConversationsInput!
 }
 
 input UserWhereInput {
@@ -1165,10 +1848,12 @@ input UserWhereInput {
   resetTokenExpiry_lte: Float
   resetTokenExpiry_gt: Float
   resetTokenExpiry_gte: Float
-  permission: Permission
-  permission_not: Permission
-  permission_in: [Permission!]
-  permission_not_in: [Permission!]
+  posts_every: PostWhereInput
+  posts_some: PostWhereInput
+  posts_none: PostWhereInput
+  conversations_every: ConversationWhereInput
+  conversations_some: ConversationWhereInput
+  conversations_none: ConversationWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -1185,9 +1870,10 @@ input UserWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
+  role: Role
+  role_not: Role
+  role_in: [Role!]
+  role_not_in: [Role!]
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
