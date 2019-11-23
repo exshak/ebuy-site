@@ -1,8 +1,8 @@
-import { Context, getUserId } from '../../utils';
+import { Context, getUserId } from '../../utils'
 
 export const message = {
   async createMessage(parent, { text, conversationId }, ctx: Context, info) {
-    const userId = getUserId(ctx);
+    const userId = getUserId(ctx)
     return await ctx.prisma.createMessage({
       text,
       user: {
@@ -11,20 +11,20 @@ export const message = {
       conversation: {
         connect: { id: conversationId }
       }
-    });
+    })
   },
 
   async deleteMessage(parent, { id }, ctx: Context, info) {
-    const userId = getUserId(ctx);
+    const userId = getUserId(ctx)
     const messageExists = await ctx.prisma.$exists.message({
       id,
       user: { id: userId }
-    });
+    })
     if (!messageExists) {
-      throw new Error(`Message not found or you're not the author`);
+      throw new Error(`Message not found or you're not the author`)
     }
 
-    return ctx.prisma.deleteMessage({ id });
+    return ctx.prisma.deleteMessage({ id })
   }
 
   // async publish(parent, { id }, ctx: Context, info) {
@@ -42,4 +42,4 @@ export const message = {
   //     data: { published: true }
   //   });
   // }
-};
+}

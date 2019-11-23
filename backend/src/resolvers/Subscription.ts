@@ -1,4 +1,4 @@
-import { Context } from '../utils';
+import { Context } from '../utils'
 
 export const Subscription = {
   feedSubscription: {
@@ -7,10 +7,10 @@ export const Subscription = {
         .post({
           mutation_in: ['CREATED', 'UPDATED']
         })
-        .node();
+        .node()
     },
     resolve: payload => {
-      return payload;
+      return payload
     }
   }
-};
+}

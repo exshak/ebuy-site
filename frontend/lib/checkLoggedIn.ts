@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import gql from 'graphql-tag'
 
 // FIXME: check types
 export default (apolloClient: any) =>
@@ -16,9 +16,9 @@ export default (apolloClient: any) =>
     })
     // FIXME: check types
     .then(({ data }: any) => {
-      return { loggedInUser: data };
+      return { loggedInUser: data }
     })
     .catch(() => {
       // Fail gracefully
-      return { loggedInUser: {} };
-    });
+      return { loggedInUser: {} }
+    })

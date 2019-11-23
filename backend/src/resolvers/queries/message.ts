@@ -1,20 +1,20 @@
-import { Context, getUserId } from "../../utils";
+import { Context, getUserId } from '../../utils'
 
 export const message = {
   message(parent, { id }, ctx: Context) {
-    return ctx.prisma.message({ id });
+    return ctx.prisma.message({ id })
   },
 
   messages(parent, args, ctx: Context) {
-    const id = getUserId(ctx);
+    const id = getUserId(ctx)
 
     const where = {
       user: {
         id
       }
-    };
+    }
 
-    return ctx.prisma.messages({ where });
+    return ctx.prisma.messages({ where })
   }
 
   // drafts(parent, args, ctx: Context) {
@@ -29,4 +29,4 @@ export const message = {
 
   //   return ctx.prisma.messages({ where });
   // }
-};
+}
