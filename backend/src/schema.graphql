@@ -3,7 +3,16 @@
 type Query {
   me: User
   post(id: ID!): Post
-  posts: [Post!]!
+  # posts: [Post!]!
+  posts(
+    where: PostWhereInput
+    orderBy: PostOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Post]!
   drafts: [Post!]!
   message(id: ID!): Message
   messages: [Message!]!
@@ -20,6 +29,7 @@ type Mutation {
     subcategoryId: ID!
     image: String
     imageLarge: String
+    published: Boolean
   ): Post!
   updatePost(
     id: ID!
