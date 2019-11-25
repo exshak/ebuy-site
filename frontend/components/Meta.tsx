@@ -1,7 +1,11 @@
 import Head from 'next/head'
 import React from 'react'
 
-export const Meta = ({ title }: any) => (
+type Props = {
+  title?: string
+}
+
+export const Meta: React.FunctionComponent<Props> = ({ title }) => (
   <Head>
     <title>{title} | Site</title>
     <meta charSet='utf-8' />

@@ -1,10 +1,10 @@
 import React from 'react'
 import { Layout } from '../components/Layout'
-import { Posts } from '../components/Posts'
+import { SinglePost } from '../components/SinglePost'
 import { withApollo } from '../lib/apollo'
 
-export default withApollo(() => (
+export default withApollo((props: any) => (
   <Layout>
-    <Posts />
+    <SinglePost id={props.url.query.id} />
   </Layout>
 ))

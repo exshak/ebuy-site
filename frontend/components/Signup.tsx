@@ -67,12 +67,7 @@ export const Signup = () => {
         {({ isSubmitting }) => (
           <Form>
             {error && <p>Issue occurred while registering :(</p>}
-            <Field
-              type='name'
-              name='name'
-              placeholder='Name'
-              component={InputField}
-            />
+            <Field name='name' placeholder='Name' component={InputField} />
             <ErrorMessage name='name' component='div' />
             <Field
               type='email'

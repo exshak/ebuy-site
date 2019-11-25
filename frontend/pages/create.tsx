@@ -1,10 +1,10 @@
 import React from 'react'
+import { CreatePost } from '../components/CreatePost'
 import { Layout } from '../components/Layout'
-import { Posts } from '../components/Posts'
 import { withApollo } from '../lib/apollo'
 
 export default withApollo(() => (
   <Layout>
-    <Posts />
+    <CreatePost />
   </Layout>
 ))

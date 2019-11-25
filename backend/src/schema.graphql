@@ -3,19 +3,18 @@
 type Query {
   me: User
   post(id: ID!): Post
-  # posts: [Post!]!
-  posts(
+  posts: [Post!]!
+  search(
     where: PostWhereInput
     orderBy: PostOrderByInput
-    skip: Int
-    after: String
-    before: String
+    filter: String
     first: Int
-    last: Int
+    skip: Int
   ): [Post]!
   drafts: [Post!]!
   message(id: ID!): Message
   messages: [Message!]!
+  subcategories: [SubCategory!]!
 }
 
 type Mutation {

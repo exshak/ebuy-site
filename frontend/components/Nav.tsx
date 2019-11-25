@@ -24,6 +24,9 @@ export const Nav = () => {
         <Link href='/posts'>
           <a style={{ textDecoration: `none` }}>Posts</a>
         </Link>
+        <Link href='/search'>
+          <a style={{ textDecoration: `none` }}>Search</a>
+        </Link>
         {!data && (
           <>
             <Link href='/signin'>
@@ -32,9 +35,9 @@ export const Nav = () => {
             <Link href='/signup'>
               <a style={{ textDecoration: `none` }}>Register</a>
             </Link>
-            <Link href='/forgot-password'>
+            {/* <Link href='/forgot-password'>
               <a style={{ textDecoration: `none` }}>Forgot Password</a>
-            </Link>
+            </Link> */}
           </>
         )}
         {data && (

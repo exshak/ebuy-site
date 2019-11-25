@@ -12,11 +12,11 @@ export const Layout: React.FunctionComponent<Props> = ({
   title = 'Title'
 }) => {
   return (
-    <div className='layout'>
+    <>
       <Meta title={title} />
       <Header />
       <main id='content'>{children}</main>
       <Footer />
-    </div>
+    </>
   )
 }

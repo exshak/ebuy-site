@@ -2,25 +2,27 @@ import Link from 'next/link'
 import React from 'react'
 import styled from 'styled-components'
 
-export const Post = ({ post }: any) => {
+type Props = {
+  post?: any
+}
+
+export const Post: React.FunctionComponent<Props> = ({ post }) => {
   return (
-    <div>
-      <PostStyle>
-        {post.image && <img src={post.image} alt={post.title} />}
-        <Title>
-          <Link
-            href={{
-              pathname: '/item',
-              query: { id: post.id }
-            }}
-          >
-            <a>{post.title}</a>
-          </Link>
-        </Title>
-        <PriceTag>{post.price}</PriceTag>
-        <p>{post.description}</p>
-      </PostStyle>
-    </div>
+    <PostStyle>
+      {post.image && <img src={post.image} alt={post.title} />}
+      <Title>
+        <Link
+          href={{
+            pathname: '/post',
+            query: { id: post.id }
+          }}
+        >
+          <a>{post.title}</a>
+        </Link>
+      </Title>
+      <PriceTag>{post.price}</PriceTag>
+      <p>{post.description}</p>
+    </PostStyle>
   )
 }
 
@@ -54,7 +56,6 @@ const PostStyle = styled.div`
     & > * {
       background: white;
       border: 0;
-      font-family: 'radnika_next';
       font-size: 1rem;
       padding: 1rem;
     }

@@ -9,6 +9,33 @@ export const post = {
     return ctx.prisma.posts({ where: { published: true } })
   },
 
+  async search(parent, args, ctx: Context) {
+    // const count = await ctx.prisma
+    //   .postsConnection({
+    //     where: {
+    //       OR: [
+    //         { title_contains: args.filter },
+    //         { description_contains: args.filter }
+    //       ]
+    //     }
+    //   })
+    //   .aggregate()
+    //   .count()
+    const posts = await ctx.prisma.posts({
+      where: {
+        OR: [
+          { title_contains: args.filter },
+          { description_contains: args.filter }
+        ],
+        published: true
+      },
+      orderBy: args.orderBy,
+      first: args.first,
+      skip: args.skip
+    })
+    return posts
+  },
+
   drafts(parent, args, ctx: Context) {
     const id = getUserId(ctx)
 
@@ -20,5 +47,9 @@ export const post = {
     }
 
     return ctx.prisma.posts({ where })
+  },
+
+  subcategories(parent, args, ctx: Context) {
+    return ctx.prisma.subCategories()
   }
 }
