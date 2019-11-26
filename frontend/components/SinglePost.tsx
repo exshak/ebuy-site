@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
+import Link from 'next/link'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -9,6 +10,7 @@ const SINGLE_POST = gql`
       id
       title
       description
+      price
       # imageLarge
     }
   }
@@ -29,8 +31,19 @@ export const SinglePost: React.FunctionComponent<Props> = ({ id }) => {
     <SinglePostStyle>
       {/* {data.imageLarge && <img src={data.imageLarge} alt={data.title} />} */}
       <div className='details'>
-        <h2>Post {data.title}</h2>
-        <p>{data.description}</p>
+        <h2>Post {data.post.title}</h2>
+        <p>{data.post.description}</p>
+        <p>{data.post.price}</p>
+      </div>
+      <div className='buttonList'>
+        <Link
+          href={{
+            pathname: 'update',
+            query: { id: data.post.id }
+          }}
+        >
+          <a>Edit</a>
+        </Link>
       </div>
     </SinglePostStyle>
   )

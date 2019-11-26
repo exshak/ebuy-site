@@ -1,7 +1,9 @@
-import { useMutation, useQuery } from '@apollo/react-hooks'
+import { useMutation } from '@apollo/react-hooks'
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import gql from 'graphql-tag'
 import React from 'react'
+import redirect from '../lib/redirect'
+import { Categories } from './Categories'
 import { InputField } from './InputField'
 
 const CREATE_POST = gql`
@@ -30,19 +32,18 @@ const CREATE_POST = gql`
   }
 `
 
-const ALL_CAT = gql`
-  query ALL_CAT {
-    subcategories {
-      id
-      name
-    }
-  }
-`
-
 export const CreatePost = () => {
-  const [create, { error }] = useMutation(CREATE_POST, {})
-  const { data } = useQuery(ALL_CAT)
-  console.log(data)
+  const onCompleted = (data: any) => {
+    redirect({}, `/post?id=${data.id}`)
+  }
+  const onError = (error: any) => {
+    // If you want to send error to external service?
+    console.error(error)
+  }
+  const [create, { error }] = useMutation(CREATE_POST, {
+    onCompleted,
+    onError
+  })
 
   return (
     <div>
@@ -51,17 +52,19 @@ export const CreatePost = () => {
         initialValues={{
           title: '',
           description: '',
-          subcategory: '',
+          subcategoryId: '',
           location: '',
           image: '',
           imageLarge: '',
-          price: 0
+          price: 0,
+          published: false
         }}
         // FIXME: add yup validation
         onSubmit={async (values, { setSubmitting }) => {
           setTimeout(() => {
             setSubmitting(false)
           }, 400)
+          values.published = true
           await create({
             variables: values
           })
@@ -86,23 +89,14 @@ export const CreatePost = () => {
             />
             <ErrorMessage name='description' component='div' />
             <Field
-              name='subcategory'
+              name='subcategoryId'
               component='select'
               style={{
                 display: `block`
               }}
               required
             >
-              <option value=''>Select a Category</option>
-              // FIXME: category selection
-              {/* {data.subcategories.map(
-                async (sub: any) =>
-                  await (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  )
-              )} */}
+              <Categories />
             </Field>
             <ErrorMessage name='subcategory' component='div' />
             <Field
