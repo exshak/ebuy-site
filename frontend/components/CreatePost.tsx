@@ -3,7 +3,6 @@ import { ErrorMessage, Field, Form, Formik } from 'formik'
 import gql from 'graphql-tag'
 import React from 'react'
 import redirect from '../lib/redirect'
-import { Categories } from './Categories'
 import { InputField } from './InputField'
 
 const CREATE_POST = gql`
@@ -32,9 +31,9 @@ const CREATE_POST = gql`
   }
 `
 
-export const CreatePost = () => {
-  const onCompleted = (data: any) => {
-    redirect({}, `/post?id=${data.id}`)
+export const CreatePost = ({ id }: any) => {
+  const onCompleted = ({ createPost: { id } }: any) => {
+    redirect({}, `/post?id=${id}`)
   }
   const onError = (error: any) => {
     // If you want to send error to external service?
@@ -52,7 +51,7 @@ export const CreatePost = () => {
         initialValues={{
           title: '',
           description: '',
-          subcategoryId: '',
+          subcategoryId: id,
           location: '',
           image: '',
           imageLarge: '',
@@ -88,7 +87,7 @@ export const CreatePost = () => {
               required
             />
             <ErrorMessage name='description' component='div' />
-            <Field
+            {/* <Field
               name='subcategoryId'
               component='select'
               style={{
@@ -96,9 +95,7 @@ export const CreatePost = () => {
               }}
               required
             >
-              <Categories />
-            </Field>
-            <ErrorMessage name='subcategory' component='div' />
+            <ErrorMessage name='subcategory' component='div' /> */}
             <Field
               type='file'
               name='image'

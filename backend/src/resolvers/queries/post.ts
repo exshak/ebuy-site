@@ -49,7 +49,7 @@ export const post = {
     return ctx.prisma.posts({ where })
   },
 
-  subcategories(parent, args, ctx: Context) {
-    return ctx.prisma.subCategories()
+  categories(parent, args, ctx: Context) {
+    return ctx.prisma.categories()
   }
 }

@@ -4,7 +4,7 @@ import { SinglePost } from '../components/SinglePost'
 import { withApollo } from '../lib/apollo'
 
 export default withApollo((props: any) => (
-  <Layout>
+  <Layout title='Post' props={props}>
     <SinglePost id={props.url.query.id} />
   </Layout>
 ))

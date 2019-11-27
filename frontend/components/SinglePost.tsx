@@ -4,7 +4,7 @@ import Link from 'next/link'
 import React from 'react'
 import styled from 'styled-components'
 
-const SINGLE_POST = gql`
+export const SINGLE_POST = gql`
   query SINGLE_POST($id: ID!) {
     post(id: $id) {
       id

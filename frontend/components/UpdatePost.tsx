@@ -32,8 +32,8 @@ type Props = {
 }
 
 export const UpdatePost: React.FunctionComponent<Props> = ({ id }) => {
-  const onCompleted = ({ updatePost }: any) => {
-    redirect({}, `/post?id=${updatePost.id}`)
+  const onCompleted = ({ updatePost: { id } }: any) => {
+    redirect({}, `/post?id=${id}`)
   }
   const onError = (error: any) => {
     // If you want to send error to external service?
@@ -62,7 +62,7 @@ export const UpdatePost: React.FunctionComponent<Props> = ({ id }) => {
             setSubmitting(false)
           }, 400)
           await update({
-            variables: values
+            variables: { values }
           })
         }}
       >

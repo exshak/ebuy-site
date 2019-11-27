@@ -4,8 +4,8 @@ import { Layout } from '../components/Layout'
 import { Signup } from '../components/Signup'
 import { withApollo } from '../lib/apollo'
 
-export default withApollo(() => (
-  <Layout title='Signup'>
+export default withApollo((props: any) => (
+  <Layout title='Signup' props={props}>
     <Signup />
     <hr />
     Already have an account?{' '}

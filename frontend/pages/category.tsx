@@ -1,10 +1,10 @@
 import React from 'react'
+import { Categories } from '../components/Categories'
 import { Layout } from '../components/Layout'
-import { UpdatePost } from '../components/UpdatePost'
 import { withApollo } from '../lib/apollo'
 
 export default withApollo((props: any) => (
-  <Layout title='Update Post' props={props}>
-    <UpdatePost id={props.url.query.id} />
+  <Layout title='Category' props={props}>
+    <Categories />
   </Layout>
 ))

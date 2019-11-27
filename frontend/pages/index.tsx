@@ -7,7 +7,7 @@ import { withApollo } from '../lib/apollo'
 import checkLoggedIn from '../lib/checkLoggedIn'
 import redirect from '../lib/redirect'
 
-const IndexPage = ({ loggedInUser }: any) => {
+const IndexPage = ({ loggedInUser, props }: any) => {
   const apolloClient = useApolloClient()
 
   const signout = () => {
@@ -24,7 +24,7 @@ const IndexPage = ({ loggedInUser }: any) => {
   }
 
   return (
-    <Layout>
+    <Layout title='Home' props={props}>
       {loggedInUser && (
         <div>
           Hello {loggedInUser.me.name}!<br />

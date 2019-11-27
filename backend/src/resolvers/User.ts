@@ -22,3 +22,9 @@ export const User = {
     return ctx.prisma.user({ id }).posts()
   }
 }
+
+export const Category = {
+  subcategories: ({ id }, args, ctx: Context) => {
+    return ctx.prisma.category({ id }).subcategories()
+  }
+}

@@ -24,7 +24,7 @@ export const Nav = () => {
         <Link href='/posts'>
           <a style={{ textDecoration: `none` }}>Posts</a>
         </Link>
-        <Link href='/create'>
+        <Link href='/category'>
           <a style={{ textDecoration: `none` }}>Create</a>
         </Link>
         <Link href='/search'>

@@ -16,8 +16,10 @@ export const post = {
     })
   },
 
-  async updatePost(parent, { id }, ctx: Context, info) {
+  async updatePost(parent, args, ctx: Context, info) {
     const userId = getUserId(ctx)
+    const id = args.id
+    delete args.id
     const postExists = await ctx.prisma.$exists.post({
       id,
       owner: { id: userId }
@@ -28,7 +30,7 @@ export const post = {
 
     return ctx.prisma.updatePost({
       where: { id },
-      data: { published: true }
+      data: { ...args }
     })
   },
 

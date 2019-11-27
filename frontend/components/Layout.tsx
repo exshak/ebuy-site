@@ -5,6 +5,7 @@ import { Meta } from './Meta'
 
 type Props = {
   title?: string
+  props?: any
 }
 
 export const Layout: React.FunctionComponent<Props> = ({

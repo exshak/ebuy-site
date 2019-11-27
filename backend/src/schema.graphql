@@ -14,7 +14,7 @@ type Query {
   drafts: [Post!]!
   message(id: ID!): Message
   messages: [Message!]!
-  subcategories: [SubCategory!]!
+  categories: [Category!]!
 }
 
 type Mutation {

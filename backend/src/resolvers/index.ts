@@ -1,6 +1,6 @@
 import Mutations from './mutations'
 import Queries from './queries'
-import { Post, User } from './User'
+import { Category, Post, User } from './User'
 
 export default {
   Query: {
@@ -9,6 +9,7 @@ export default {
   Mutation: {
     ...Mutations
   },
+  Category,
   Post,
   User
 }
