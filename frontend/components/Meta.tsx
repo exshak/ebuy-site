@@ -5,7 +5,7 @@ type Props = {
   title?: string
 }
 
-export const Meta: React.FunctionComponent<Props> = ({ title }) => (
+export const Meta: React.FC<Props> = ({ title }) => (
   <Head>
     <title>{title} | Site</title>
     <meta charSet='utf-8' />

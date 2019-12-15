@@ -31,7 +31,7 @@ type Props = {
   id?: string
 }
 
-export const UpdatePost: React.FunctionComponent<Props> = ({ id }) => {
+export const UpdatePost: React.FC<Props> = ({ id }) => {
   const onCompleted = ({ updatePost: { id } }: any) => {
     redirect({}, `/post?id=${id}`)
   }

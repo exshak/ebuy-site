@@ -20,7 +20,7 @@ type Props = {
   id?: string
 }
 
-export const SinglePost: React.FunctionComponent<Props> = ({ id }) => {
+export const SinglePost: React.FC<Props> = ({ id }) => {
   const { loading, error, data } = useQuery(SINGLE_POST, {
     variables: { id }
   })

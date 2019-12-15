@@ -6,7 +6,7 @@ type Props = {
   post?: any
 }
 
-export const Post: React.FunctionComponent<Props> = ({ post }) => {
+export const Post: React.FC<Props> = ({ post }) => {
   return (
     <PostStyle>
       {post.image && <img src={post.image} alt={post.title} />}
