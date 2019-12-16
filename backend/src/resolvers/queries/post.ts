@@ -9,6 +9,13 @@ export const post = {
     return ctx.prisma.posts({ where: { published: true } })
   },
 
+  async myposts(parent, { id }, ctx: Context) {
+    const posts = await ctx.prisma.posts({
+      where: { owner: { id } }
+    })
+    return posts
+  },
+
   async search(parent, args, ctx: Context) {
     // const count = await ctx.prisma
     //   .postsConnection({

@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import Link from 'next/link'
 import React from 'react'
+import { StyledCategories } from './styles'
 
 const ALL_CAT = gql`
   query ALL_CAT {
@@ -24,7 +25,7 @@ export const Categories: any = () => {
   // if (loading || !data) return <Fetching />;
 
   return (
-    <div>
+    <StyledCategories>
       {data.categories.map((cat: any) => (
         <div key={cat.id}>
           <h1>{cat.name}</h1>
@@ -44,7 +45,7 @@ export const Categories: any = () => {
           </ul>
         </div>
       ))}
-    </div>
+    </StyledCategories>
   )
   //     <option value=''>Select a Category</option>
   //     {data.subcategories.map((cat: any) => (

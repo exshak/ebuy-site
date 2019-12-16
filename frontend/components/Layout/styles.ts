@@ -20,6 +20,7 @@ export const GlobalStyle = createGlobalStyle`
     background-color: #f7f7f7;
     color: ${props => props.theme.colors.black};
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
   }
   main {
     margin-top: 50px;

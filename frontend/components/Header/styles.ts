@@ -35,7 +35,6 @@ export const StyledNav = styled.div`
     /* display: flex; */
     /* align-items: center; */
     /* position: relative; */
-    /* text-transform: uppercase; */
     /* font-weight: 700; */
     /* font-size: 1em; */
     /* background: none; */
@@ -93,9 +92,21 @@ export const StyledList = styled.div`
   align-items: center;
   display: flex;
   justify-content: flex-end;
+  line-height: 1rem;
   width: 90%;
   a {
     font-weight: 700;
     padding: 0 5px;
+  }
+`
+
+export const StyledLink = styled.div`
+  background-color: royalblue;
+  border-radius: 5px;
+  border: none;
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  a {
+    color: white;
   }
 `

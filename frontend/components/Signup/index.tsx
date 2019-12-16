@@ -2,25 +2,26 @@ import { useApolloClient, useMutation } from '@apollo/react-hooks'
 import cookie from 'cookie'
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import gql from 'graphql-tag'
-import redirect from '../lib/redirect'
-import { InputField } from './InputField'
+import redirect from '../../lib/redirect'
+import { StyledButton } from '../Common/Button'
+import { InputField } from '../Common/FormInput'
+import { StyledSignup } from './styles'
 
-const SIGN_IN = gql`
-  mutation Signin($email: String!, $password: String!) {
-    signin(email: $email, password: $password) {
+const CREATE_USER = gql`
+  mutation Create($name: String!, $email: String!, $password: String!) {
+    signup(name: $name, email: $email, password: $password) {
       token
     }
   }
 `
 
-export const Signin = () => {
+export const Signup = () => {
   const client = useApolloClient()
   const onCompleted = (data: any) => {
     // Store the token in cookie
-    document.cookie = cookie.serialize('token', data.signin.token, {
-      sameSite: true,
-      path: '/',
-      maxAge: 30 * 24 * 60 * 60 // 30 days
+    document.cookie = cookie.serialize('token', data.signup.token, {
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: '/' // make cookie available for all routes underneath "/"
     })
     // Force a reload of all the current queries now that the user is
     // logged in
@@ -32,16 +33,16 @@ export const Signin = () => {
     // If you want to send error to external service?
     console.error(error)
   }
-  const [signin, { error }] = useMutation(SIGN_IN, {
+  const [create, { error }] = useMutation(CREATE_USER, {
     onCompleted,
     onError
   })
 
   return (
-    <div>
-      <h1>Signin</h1>
+    <StyledSignup>
+      <h1>Signup</h1>
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ name: '', email: '', password: '' }}
         // FIXME: add yup validation
         validate={values => {
           const errors = {}
@@ -60,14 +61,16 @@ export const Signin = () => {
           setTimeout(() => {
             setSubmitting(false)
           }, 400)
-          await signin({
+          await create({
             variables: values
           })
         }}
       >
         {({ isSubmitting }) => (
           <Form>
-            {error && <p>No user found with that information.</p>}
+            {error && <p>Issue occurred while registering :(</p>}
+            <Field name='name' placeholder='Name' component={InputField} />
+            <ErrorMessage name='name' component='div' />
             <Field
               type='email'
               name='email'
@@ -82,12 +85,12 @@ export const Signin = () => {
               component={InputField}
             />
             <ErrorMessage name='password' component='div' />
-            <button type='submit' disabled={isSubmitting}>
-              Sign In
-            </button>
+            <StyledButton type='submit' disabled={isSubmitting}>
+              Register
+            </StyledButton>
           </Form>
         )}
       </Formik>
-    </div>
+    </StyledSignup>
   )
 }

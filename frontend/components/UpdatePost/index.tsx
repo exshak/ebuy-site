@@ -2,76 +2,75 @@ import { useMutation } from '@apollo/react-hooks'
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import gql from 'graphql-tag'
 import React from 'react'
-import redirect from '../lib/redirect'
-import { InputField } from './InputField'
+import redirect from '../../lib/redirect'
+import { StyledButton } from '../Common/Button'
+import { InputField } from '../Common/FormInput'
+import { StyledUpdatePost } from './styles'
 
-const CREATE_POST = gql`
-  mutation CREATE_POST(
+const UPDATE_POST = gql`
+  mutation UPDATE_POST(
+    $id: ID!
     $title: String!
     $description: String!
-    $location: String!
     $price: Int!
-    $subcategoryId: ID!
     $image: String
     $imageLarge: String
-    $published: Boolean
   ) {
-    createPost(
+    updatePost(
+      id: $id
       title: $title
       description: $description
-      location: $location
       price: $price
-      subcategoryId: $subcategoryId
       image: $image
       imageLarge: $imageLarge
-      published: $published
     ) {
       id
     }
   }
 `
 
-export const CreatePost = ({ id }: any) => {
-  const onCompleted = ({ createPost: { id } }: any) => {
+type Props = {
+  id?: string
+}
+
+export const UpdatePost: React.FC<Props> = ({ id }) => {
+  const onCompleted = ({ updatePost: { id } }: any) => {
     redirect({}, `/post?id=${id}`)
   }
   const onError = (error: any) => {
     // If you want to send error to external service?
     console.error(error)
   }
-  const [create, { error }] = useMutation(CREATE_POST, {
+  const [update, { error }] = useMutation(UPDATE_POST, {
     onCompleted,
     onError
   })
 
   return (
-    <div>
-      <h1>Create Post</h1>
+    <StyledUpdatePost>
+      <h1>Update Post</h1>
       <Formik
         initialValues={{
+          id: id,
           title: '',
           description: '',
-          subcategoryId: id,
-          location: '',
           image: '',
           imageLarge: '',
-          price: 0,
-          published: false
+          price: 0
         }}
         // FIXME: add yup validation
         onSubmit={async (values, { setSubmitting }) => {
           setTimeout(() => {
             setSubmitting(false)
           }, 400)
-          values.published = true
-          await create({
-            variables: values
+          await update({
+            variables: { values }
           })
         }}
       >
         {({ isSubmitting }) => (
           <Form>
-            {error && <p>Issue occurred while creating post :(</p>}
+            {error && <p>Issue occurred while updating post :(</p>}
             <Field
               name='title'
               placeholder='Title'
@@ -87,15 +86,6 @@ export const CreatePost = ({ id }: any) => {
               required
             />
             <ErrorMessage name='description' component='div' />
-            {/* <Field
-              name='subcategoryId'
-              component='select'
-              style={{
-                display: `block`
-              }}
-              required
-            >
-            <ErrorMessage name='subcategory' component='div' /> */}
             <Field
               type='file'
               name='image'
@@ -104,13 +94,6 @@ export const CreatePost = ({ id }: any) => {
             />
             <ErrorMessage name='image' component='div' />
             <Field
-              name='location'
-              placeholder='Location'
-              component={InputField}
-              required
-            />
-            <ErrorMessage name='location' component='div' />
-            <Field
               type='number'
               name='price'
               placeholder='Price'
@@ -118,12 +101,12 @@ export const CreatePost = ({ id }: any) => {
               required
             />
             <ErrorMessage name='price' component='div' />
-            <button type='submit' disabled={isSubmitting}>
-              Create
-            </button>
+            <StyledButton type='submit' disabled={isSubmitting}>
+              Update
+            </StyledButton>
           </Form>
         )}
       </Formik>
-    </div>
+    </StyledUpdatePost>
   )
 }
